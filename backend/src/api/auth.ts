@@ -28,6 +28,7 @@ export default async function apiLoginUser(req: Request, res: Response, next: Ne
 
     let user = await usersDao.getUserByGoogleId(verify.payload.sub);
 
+
     if (!user) {
         // register user
         try {
@@ -50,11 +51,25 @@ async function registerUser(google_payload: TokenPayload) {
 
     if (!google_payload.email) {
         let err: ApiFuncError = {
-            message: "Missing email",
+            message: "Er is geen email op je google-account gevonden.",
             code: 400
         }
         throw err;
     }
+
+
+
+    if (!google_payload.email.endsWith("@fiorettileerling.nl") || 
+        !google_payload.email.endsWith("@fioretti.nl") || 
+        !google_payload.email.endsWith("@sft-vo.nl")) {
+
+        let err: ApiFuncError = {
+            message: "Je moet je school-email gebruiken om in te loggen.",
+            code: 403
+        }
+        throw err;
+    }
+
 
 
     const userObj: User = {
@@ -65,6 +80,9 @@ async function registerUser(google_payload: TokenPayload) {
         last_name: google_payload.family_name,
         createdAt: new Date()
     }
+
+
+
 
     const result = await usersDao.createUser(userObj);
 

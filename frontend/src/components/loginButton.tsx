@@ -1,34 +1,47 @@
 'use client'
 
+import ApiError from '@/interfaces/apiError';
+import User from '@/interfaces/user';
 import { GoogleLogin, GoogleOAuthProvider, CredentialResponse } from '@react-oauth/google';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import { useEffect, useState } from 'react';
 
 
 
 
 
-export default function LoginButton() {
+
+export default function LoginButton({onFail, onSuccess} : {onFail?: (status: number | undefined, message: string | undefined) => void, onSuccess?: () => void}) {
 
 
     /*useEffect(() => {
 
     });*/
 
-    const [name, setName] = useState("");
     
 
     async function loginUser(googleResponse: CredentialResponse) {
         if (!googleResponse.clientId) return;
 
-        axios.post('http://localhost:8000/api/auth', {
+        axios.post<User>(`${process.env.NEXT_PUBLIC_API_URL}/auth`, {
             token: googleResponse.credential
         }).then((res) => {
             console.log(res.data);
-        }).catch((err) => {
-            //console.log(err);
+            if (onSuccess) onSuccess();
+        }).catch((e: AxiosError) => {
+            if (e.response) {
+                const res = e.response.data as ApiError;
+                if (onFail) onFail(e.status, res.error)
+            } else {
+                if (onFail) onFail(e.status, undefined);
+            }
+            
         });
+
+
     }
+
+
 
 
     return (
