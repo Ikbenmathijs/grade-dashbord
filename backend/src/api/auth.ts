@@ -40,8 +40,16 @@ export default async function apiLoginUser(req: Request, res: Response, next: Ne
             return;
         }
     }
+    console.log(new Date(verify.payload.exp * 1000).toLocaleString());
+
+    res.cookie("test", "Hello!", /*{
+        secure: process.env.ENV !== "DEV",
+        httpOnly: true,
+        expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 5)
+    }*/);
 
     res.status(200).json(user);
+    
     
 
 

@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation"
 
 
 
-export default function loggedInOnly() {
+export default function checkLogin() {
 
     const router = useRouter();
 

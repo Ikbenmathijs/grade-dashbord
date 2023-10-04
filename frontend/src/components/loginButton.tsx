@@ -15,7 +15,7 @@ export default function LoginButton({onFail, onSuccess} : {onFail?: (status: num
 
 
     useEffect(() => {
-
+        
     });
 
     
@@ -25,9 +25,10 @@ export default function LoginButton({onFail, onSuccess} : {onFail?: (status: num
 
         axios.post<User>(`${process.env.NEXT_PUBLIC_API_URL}/auth`, {
             token: googleResponse.credential
-        }).then((res) => {
+        }, {withCredentials: true}).then((res) => {
             console.log(res.data);
             localStorage.setItem("loginToken", googleResponse.credential as string);
+            
             if (onSuccess) onSuccess();
         }).catch((e: AxiosError) => {
             if (e.response) {
