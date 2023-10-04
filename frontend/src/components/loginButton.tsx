@@ -14,19 +14,20 @@ import { useEffect, useState } from 'react';
 export default function LoginButton({onFail, onSuccess} : {onFail?: (status: number | undefined, message: string | undefined) => void, onSuccess?: () => void}) {
 
 
-    /*useEffect(() => {
+    useEffect(() => {
 
-    });*/
+    });
 
     
 
     async function loginUser(googleResponse: CredentialResponse) {
-        if (!googleResponse.clientId) return;
+        if (!googleResponse.credential) return;
 
         axios.post<User>(`${process.env.NEXT_PUBLIC_API_URL}/auth`, {
             token: googleResponse.credential
         }).then((res) => {
             console.log(res.data);
+            localStorage.setItem("loginToken", googleResponse.credential as string);
             if (onSuccess) onSuccess();
         }).catch((e: AxiosError) => {
             if (e.response) {
