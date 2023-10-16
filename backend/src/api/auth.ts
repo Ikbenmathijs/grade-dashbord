@@ -18,7 +18,7 @@ export default async function apiLoginUser(req: Request, res: Response, next: Ne
 
     // check if google token is valid
     if (!verify.valid) {
-        res.status(401).send("Unauthorised");
+        res.status(401).json({error: "Invalid google token"});
         return;
     }
 
@@ -42,11 +42,11 @@ export default async function apiLoginUser(req: Request, res: Response, next: Ne
     }
     console.log(new Date(verify.payload.exp * 1000).toLocaleString());
 
-    res.cookie("test", "Hello!", /*{
-        secure: process.env.ENV !== "DEV",
+    res.cookie("aaaa", "aaaaaa!", {
+        secure: process.env.ENV !== "dev",
         httpOnly: true,
-        expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 5)
-    }*/);
+        expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 2)
+    });
 
     res.status(200).json(user);
     

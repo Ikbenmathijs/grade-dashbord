@@ -25,15 +25,18 @@ export default function LoginButton({onFail, onSuccess} : {onFail?: (status: num
 
         axios.post<User>(`${process.env.NEXT_PUBLIC_API_URL}/auth`, {
             token: googleResponse.credential
-        }, {withCredentials: true}).then((res) => {
+        }, {withCredentials: true
+            }).then((res) => {
             console.log(res.data);
-            localStorage.setItem("loginToken", googleResponse.credential as string);
+            localStorage.setItem("loginToken", googleResponse.credential as string);    
             
             if (onSuccess) onSuccess();
         }).catch((e: AxiosError) => {
             if (e.response) {
-                const res = e.response.data as ApiError;
-                if (onFail) onFail(e.status, res.error)
+                if ((e.response.data as Object).hasOwnProperty("error")) {
+                    const res = e.response.data as ApiError;
+                    if (onFail) onFail(e.status, res.error);
+                }
             } else {
                 if (onFail) onFail(e.status, undefined);
             }
