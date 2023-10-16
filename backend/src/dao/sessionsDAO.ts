@@ -39,4 +39,15 @@ export default class SessionsDAO {
             return null;
         }
     }
+
+    static async deleteSession(id: UUID) {
+        try {
+            const result = await sessions.deleteOne({_id: id});
+            return result.deletedCount;
+        } catch (e) {
+            log(LogLevel.Debug, `Unable to delete session: ${e}`);
+            return null;
+        }
+    }
+    
 }

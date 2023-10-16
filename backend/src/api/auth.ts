@@ -9,12 +9,7 @@ import { v4 as uuidv4 } from 'uuid';
 import SessionsDAO from '../dao/sessionsDAO';
 
 
-
-
-
-
 const client = new OAuth2Client(process.env.CLIENT_ID);
-
 
 
 export async function apiLoginUser(req: Request, res: Response, next: NextFunction) {
@@ -69,8 +64,7 @@ export async function apiLoginUser(req: Request, res: Response, next: NextFuncti
         return;
     }
 
-
-
+    // send cookie
     res.cookie("Session", session_id, {
         secure: process.env.ENV !== "dev",
         httpOnly: true,
@@ -83,7 +77,6 @@ export async function apiLoginUser(req: Request, res: Response, next: NextFuncti
 
 export async function apiVerifySession(req: Request, res: Response, next: NextFunction) {
 
-
     let sessionCookie = req.cookies["Session"];
 
     if (!sessionCookie) {
@@ -92,14 +85,39 @@ export async function apiVerifySession(req: Request, res: Response, next: NextFu
     }
 
     if (!verifySession(sessionCookie)) {
-        res.status(401).json({error: "Je sessie is verlopen"});
+        res.status(401).json({error: "Je sessie is verlopen of bestaat niet"});
         return;
     }
 
+    res.status(200).json();
+}
 
+
+export async function apiLogoutUser(req: Request, res: Response, next: NextFunction) {
+
+
+    let sessionCookie = req.cookies["Session"];
+
+    if (!sessionCookie) {
+        res.status(401).json({error: "Je was al uitgelogd (er was geen sessie cookie gevonden)"});
+        return;
+    }
+
+    if (!verifySession(sessionCookie)) {
+        res.status(401).json({error: "Je was al uitgelogd (je sessie was verlopen of bestond niet)"});
+        return;
+    }
+
+    const result = await SessionsDAO.deleteSession(new UUID(sessionCookie));
+
+    if (!result) {
+        res.status(500).json({error: "Niet gelukt om sessie te verwijderen"});
+        return;
+    }
+
+    res.clearCookie("Session");
 
     res.status(200).json();
-
 }
 
 
@@ -114,8 +132,6 @@ async function registerUser(google_payload: TokenPayload) {
         throw err;
     }
 
-
-
     if (!google_payload.email.endsWith("@fiorettileerling.nl") || 
         !google_payload.email.endsWith("@fioretti.nl") || 
         !google_payload.email.endsWith("@sft-vo.nl")) {
@@ -127,8 +143,6 @@ async function registerUser(google_payload: TokenPayload) {
         throw err;
     }
 
-
-
     const userObj: User = {
         _id: new ObjectId(),
         googleId: google_payload.sub,
@@ -137,9 +151,6 @@ async function registerUser(google_payload: TokenPayload) {
         last_name: google_payload.family_name,
         createdAt: new Date()
     }
-
-
-
 
     const result = await usersDao.createUser(userObj);
 
