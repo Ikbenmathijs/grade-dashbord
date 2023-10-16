@@ -3,7 +3,12 @@ import {Request, Response, NextFunction} from "express";
 import usersDao from '../dao/usersDAO';
 import User from '../interfaces/user';
 import ApiFuncError from '../interfaces/apiFuncError';
-import { ObjectId } from 'mongodb';
+import { ObjectId, UUID } from 'mongodb';
+import Session from '../interfaces/session';
+import { v4 as uuidv4 } from 'uuid';
+import SessionsDAO from '../dao/sessionsDAO';
+
+
 
 
 
@@ -12,13 +17,13 @@ const client = new OAuth2Client(process.env.CLIENT_ID);
 
 
 
-export default async function apiLoginUser(req: Request, res: Response, next: NextFunction) {
+export async function apiLoginUser(req: Request, res: Response, next: NextFunction) {
 
-    const verify = await verifyLogin(req.body.token);
+    const verify = await verifyGoogleToken(req.body.token);
 
     // check if google token is valid
     if (!verify.valid) {
-        res.status(401).json({error: "Invalid google token"});
+        res.status(401).json({error: "Google token bestaat niet of is verlopen"});
         return;
     }
 
@@ -41,19 +46,63 @@ export default async function apiLoginUser(req: Request, res: Response, next: Ne
         }
     }
     console.log(new Date(verify.payload.exp * 1000).toLocaleString());
+    
 
-    res.cookie("aaaa", "aaaaaa!", {
+    // makes user valid 
+    if (!user) {
+        res.status(500).json({error: "Niet gelukt om gebruiker te maken of te vinden"});
+        return;
+    };
+
+
+    // create session
+    let session: Session = {
+        _id: new UUID(uuidv4()),
+        userId: user._id,
+        expires: new Date(Date.now() + 24 * 60 * 60 * 1000)
+    };
+
+    const session_id = await SessionsDAO.createSession(session);
+
+    if (!session_id) {
+        res.status(500).json({error: "Niet gelukt om sessie te maken"});
+        return;
+    }
+
+
+
+    res.cookie("Session", session_id, {
         secure: process.env.ENV !== "dev",
         httpOnly: true,
-        expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 2)
+        expires: session.expires
     });
 
     res.status(200).json(user);
-    
-    
+}
 
+
+export async function apiVerifySession(req: Request, res: Response, next: NextFunction) {
+
+
+    let sessionCookie = req.cookies["Session"];
+
+    if (!sessionCookie) {
+        res.status(401).json({error: "Je bent niet ingelogd"});
+        return;
+    }
+
+    if (!verifySession(sessionCookie)) {
+        res.status(401).json({error: "Je sessie is verlopen"});
+        return;
+    }
+
+
+
+    res.status(200).json();
 
 }
+
+
 
 async function registerUser(google_payload: TokenPayload) {
 
@@ -108,7 +157,7 @@ async function registerUser(google_payload: TokenPayload) {
 }
 
 
-async function verifyLogin(token: string) {
+async function verifyGoogleToken(token: string) {
 
     try {
         const ticket = await client.verifyIdToken({
@@ -122,4 +171,16 @@ async function verifyLogin(token: string) {
     } catch(e) {
         return {valid: false, payload: undefined}
     }
+}
+
+
+async function verifySession(token: string) {
+
+    const session = await SessionsDAO.getSessionById(new UUID(token));
+
+    if (!session) return false;
+
+    if (session.expires < new Date()) return false;
+
+    return true;
 }

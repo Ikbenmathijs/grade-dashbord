@@ -4,7 +4,6 @@ import ApiError from '@/interfaces/apiError';
 import User from '@/interfaces/user';
 import { GoogleLogin, GoogleOAuthProvider, CredentialResponse } from '@react-oauth/google';
 import axios, { AxiosError } from 'axios';
-import { useEffect, useState } from 'react';
 
 
 
@@ -12,13 +11,6 @@ import { useEffect, useState } from 'react';
 
 
 export default function LoginButton({onFail, onSuccess} : {onFail?: (status: number | undefined, message: string | undefined) => void, onSuccess?: () => void}) {
-
-
-    useEffect(() => {
-        
-    });
-
-    
 
     async function loginUser(googleResponse: CredentialResponse) {
         if (!googleResponse.credential) return;
@@ -28,9 +20,11 @@ export default function LoginButton({onFail, onSuccess} : {onFail?: (status: num
         }, {withCredentials: true
             }).then((res) => {
             console.log(res.data);
-            localStorage.setItem("loginToken", googleResponse.credential as string);    
+            localStorage.setItem("loginToken", googleResponse.credential as string);   
             
             if (onSuccess) onSuccess();
+
+            
         }).catch((e: AxiosError) => {
             if (e.response) {
                 if ((e.response.data as Object).hasOwnProperty("error")) {

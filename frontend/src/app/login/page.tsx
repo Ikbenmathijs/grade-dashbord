@@ -3,11 +3,12 @@
 import ErrorMessage from "@/components/errorMessage"
 import LoginButton from "@/components/loginButton"
 import { useState } from "react";
-import Router, { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function loginPage() {
 
     const router = useRouter();
+    const searchParams = useSearchParams();
 
     const [errorHidden, setErrorHidden] = useState(true);
     const [errorMessage, setErrorMessage] = useState("");
@@ -23,7 +24,12 @@ export default function loginPage() {
     }
 
     function onLoginSuccess() {
-        router.push("/");
+        if (searchParams.has("r")) {
+            router.push(searchParams.get("r") as string);
+        } else {
+            router.push("/");
+        }
+
     }
 
     

@@ -5,8 +5,9 @@ import router from './route';
 import { ServerApiVersion, MongoClient } from 'mongodb';
 import log from './logger';
 import LogLevel from './enums/logLevel';
-import e from 'express';
-import usersDao from './dao/usersDAO';
+import UsersDao from './dao/usersDAO';
+import SessionsDAO from './dao/sessionsDAO';
+import cookieParser from 'cookie-parser';
 
 dotenv.config();
 
@@ -19,7 +20,9 @@ app.use(cors({
 }));
 
 
-app.use(express.json());  
+app.use(express.json());
+
+app.use(cookieParser());
 
 
 app.use("/api", router);
@@ -43,10 +46,11 @@ client.connect().catch((e) => {
 
   
   app.listen(port, () => {
-    usersDao.injectDB(client);
+    UsersDao.injectDB(client);
+    SessionsDAO.injectDB(client);
     console.log(`⚡️[server]: Server is running at http://localhost:${port}`);
   });
-})
+});
 
 
 
