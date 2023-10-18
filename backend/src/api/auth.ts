@@ -11,7 +11,16 @@ import SessionsDAO from '../dao/sessionsDAO';
 
 const client = new OAuth2Client(process.env.CLIENT_ID);
 
-
+/**
+ * Logs in the user, or creates a new account if the user doesn't exist yet.
+ * In the request's body a google token is expected.
+ * 
+ * If the token is valid, the user is logged in and a cookie containing the session ID is sent.
+ * @param req Express request
+ * @param res Express response
+ * @param next Next function
+ * @returns 
+ */
 export async function apiLoginUser(req: Request, res: Response, next: NextFunction) {
 
     const verify = await verifyGoogleToken(req.body.token);
@@ -25,25 +34,22 @@ export async function apiLoginUser(req: Request, res: Response, next: NextFuncti
     // for typescript to make sure it's not undefined
     if (!verify.payload) return;
 
-
+    // get user from database
     let user = await usersDao.getUserByGoogleId(verify.payload.sub);
 
-
+    // create user if it doesn't exist
     if (!user) {
-        // register user
         try {
             user = await registerUser(verify.payload);
-
         } catch (e) {
             const err = e as ApiFuncError;
             res.status(err.code).json({error: err.message});
             return;
         }
     }
-    console.log(new Date(verify.payload.exp * 1000).toLocaleString());
     
 
-    // makes user valid 
+    // check if user exists (if not something went wrong while creating the user)
     if (!user) {
         res.status(500).json({error: "Niet gelukt om gebruiker te maken of te vinden"});
         return;
@@ -71,57 +77,85 @@ export async function apiLoginUser(req: Request, res: Response, next: NextFuncti
         expires: session.expires
     });
 
+    // success
     res.status(200).json(user);
 }
 
 
+/**
+ * Checks if the user has a valid session cookie. Sends a 200 (OK) status code if the session is valid and thus the user is logged in
+ * 
+ * @param req Express request
+ * @param res Express response
+ * @param next Next function
+ * @returns 
+ */
 export async function apiVerifySession(req: Request, res: Response, next: NextFunction) {
-
+    // get session cookie
     let sessionCookie = req.cookies["Session"];
 
+    // check if session cookie exists
     if (!sessionCookie) {
         res.status(401).json({error: "Je bent niet ingelogd"});
         return;
     }
 
+    // check if session is valid
     if (!verifySession(sessionCookie)) {
         res.status(401).json({error: "Je sessie is verlopen of bestaat niet"});
         return;
     }
 
+    // success
     res.status(200).json();
 }
 
-
+/**
+ * Invalidades a user's session ID, clearing their session cookie and thus logging them out.
+ * @param req Express request
+ * @param res Express response
+ * @param next Next function
+ * @returns 
+ */
 export async function apiLogoutUser(req: Request, res: Response, next: NextFunction) {
 
-
+    // get session cookie
     let sessionCookie = req.cookies["Session"];
 
+    // check if session cookie exists
     if (!sessionCookie) {
         res.status(401).json({error: "Je was al uitgelogd (er was geen sessie cookie gevonden)"});
         return;
     }
 
+    // check if session is valid
     if (!verifySession(sessionCookie)) {
         res.status(401).json({error: "Je was al uitgelogd (je sessie was verlopen of bestond niet)"});
         return;
     }
 
+    // delete session
     const result = await SessionsDAO.deleteSession(new UUID(sessionCookie));
 
+    // check if session was deleted successfully
     if (!result) {
         res.status(500).json({error: "Niet gelukt om sessie te verwijderen"});
         return;
     }
 
+    // clear the session cookie because the sessions was deleted
     res.clearCookie("Session");
 
+    // success
     res.status(200).json();
 }
 
 
-
+/**
+ * Creates a new user in the database
+ * @param google_payload Information about the user's google account gathered from the JWT token
+ * @returns The created user
+ */
 async function registerUser(google_payload: TokenPayload) {
 
     if (!google_payload.email) {
@@ -167,7 +201,11 @@ async function registerUser(google_payload: TokenPayload) {
     return user;
 }
 
-
+/**
+ * Checks if the google JWT token returned by the "log in with google button" from the frontend is valid.
+ * @param token Google token
+ * @returns 
+ */
 async function verifyGoogleToken(token: string) {
 
     try {
@@ -184,10 +222,14 @@ async function verifyGoogleToken(token: string) {
     }
 }
 
+/**
+ * Checks if the session is valid.
+ * @param sessionId Session ID
+ * @returns Boolean
+ */
+async function verifySession(sessionId: string): Promise<Boolean> {
 
-async function verifySession(token: string) {
-
-    const session = await SessionsDAO.getSessionById(new UUID(token));
+    const session = await SessionsDAO.getSessionById(new UUID(sessionId));
 
     if (!session) return false;
 

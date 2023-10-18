@@ -1,7 +1,11 @@
 import express from 'express';
 import {apiLoginUser, apiVerifySession, apiLogoutUser} from './api/auth';
-import {Request, Response, NextFunction} from "express";
 
+/**
+ * This file contains all the routes for the API
+ * It is imported in index.ts
+ * It tells the server what function to run whenever a request is made on a certain path
+ */
 
 const router = express.Router();
 

@@ -1,3 +1,7 @@
+
+/**
+ * Enum for log levels.
+ */
 const enum LogLevel {
     Debug, 
     Info, 

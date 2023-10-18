@@ -6,26 +6,34 @@ import { GoogleLogin, GoogleOAuthProvider, CredentialResponse } from '@react-oau
 import axios, { AxiosError } from 'axios';
 
 
-
-
-
-
+/**
+ * Login button component. Optionally you can pass a onFail and onSuccess callback.
+ * 
+ */
 export default function LoginButton({onFail, onSuccess} : {onFail?: (status: number | undefined, message: string | undefined) => void, onSuccess?: () => void}) {
 
+    /**
+     * Run whenever the google login was completed
+     * @param googleResponse 
+     * @returns 
+     */
     async function loginUser(googleResponse: CredentialResponse) {
+        
         if (!googleResponse.credential) return;
-
-        axios.post<User>(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
+        
+        // Sends a request to the backend to login the user with the google JWT token
+        axios.post<User>(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, 
+        {
             token: googleResponse.credential
-        }, {withCredentials: true
-            }).then((res) => {
-            console.log(res.data);
-            localStorage.setItem("loginToken", googleResponse.credential as string);   
-            
-            if (onSuccess) onSuccess();
+        }, 
+        {
+            withCredentials: true
+        }).then((res) => {
+                // Runs when the login was successful                
+                if (onSuccess) onSuccess();
 
-            
         }).catch((e: AxiosError) => {
+            // Runs when the login failed. It calls the onFail callback if it exists
             if (e.response) {
                 if ((e.response.data as Object).hasOwnProperty("error")) {
                     const res = e.response.data as ApiError;
@@ -40,14 +48,21 @@ export default function LoginButton({onFail, onSuccess} : {onFail?: (status: num
         });
     }
 
+    /**
+     * Run whenever the google login failed. This is a fault at google, not in the backend
+     */
+    function googleLoginError() {
+        if (onFail) onFail(undefined, "Google login mislukt!");
+    }
+
 
 
 
     return (
-        <div>
+        <>
             <GoogleOAuthProvider clientId="714726516267-hn2jg6dl88eset2hbt78p6l74s5smj2v.apps.googleusercontent.com">
-                <GoogleLogin onSuccess={loginUser} onError={() => console.log("rip :(")} />
+                <GoogleLogin onSuccess={loginUser} onError={googleLoginError} />
             </GoogleOAuthProvider>
-        </div>
+        </>
     )
 }

@@ -1,6 +1,8 @@
+/**
+ * Error Message Component
+ */
+
 export default function ErrorMessage ({title, desc, hidden, setHiddenCallback, okButtonCallback}: {title: string; desc: string, hidden:boolean | undefined, setHiddenCallback: Function, okButtonCallback?: Function}) {
-
-
 
     function okButtonClicked() {
         setHiddenCallback(true);
