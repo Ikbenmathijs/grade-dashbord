@@ -204,7 +204,7 @@ async function registerUser(google_payload: TokenPayload) {
 /**
  * Checks if the google JWT token returned by the "log in with google button" from the frontend is valid.
  * @param token Google token
- * @returns 
+ * @returns Object containing a boolean indicating if the token is valid and the payload of the token
  */
 async function verifyGoogleToken(token: string) {
 
