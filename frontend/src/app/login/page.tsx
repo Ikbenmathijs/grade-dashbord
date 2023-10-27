@@ -35,7 +35,13 @@ export default function loginPage() {
     
     return (
         <div>
-            <LoginButton onFail={onLoginError} onSuccess={onLoginSuccess} />
+            <div className="h-screen flex justify-center items-center">
+                <div className="bg-amber-500 w-64 h-64">
+                    <h2 className="m-1">Log in</h2>
+                    <LoginButton onFail={onLoginError} onSuccess={onLoginSuccess} />
+                </div>
+                
+            </div>
             <ErrorMessage setHiddenCallback={setErrorHidden} title={errorTitle} desc={errorMessage} hidden={errorHidden} />
         </div>
     )

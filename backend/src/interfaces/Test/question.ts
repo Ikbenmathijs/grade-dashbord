@@ -6,9 +6,8 @@ import questionType from "../../enums/Test/questionType";
 
 export default interface Question {
     _id: ObjectId;
-    question: string;
-    answers: string[];
-    correctAnswer: number;
+    test: ObjectId;
+    points: number;
     domain: questionDomain;
     dimension: questionDimension;
     questionType: questionType;
