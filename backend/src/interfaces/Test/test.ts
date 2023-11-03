@@ -5,7 +5,8 @@ import educationLevel from "../../enums/Test/educationLevel";
 export default interface Test {
     _id: ObjectId;
     name: string;
-    educationLevel: educationLevel;
-    educationYear: number;
-    year: number;
+    totalPoints: number;
+    totalQuestions: number;
+    Sheetcode: string;
+    Version: string;
 }

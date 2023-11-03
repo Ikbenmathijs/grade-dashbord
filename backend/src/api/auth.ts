@@ -11,6 +11,7 @@ import SessionsDAO from '../dao/sessionsDAO';
 
 const client = new OAuth2Client(process.env.CLIENT_ID);
 
+
 /**
  * Logs in the user, or creates a new account if the user doesn't exist yet.
  * In the request's body a google token is expected.
@@ -33,6 +34,11 @@ export async function apiLoginUser(req: Request, res: Response, next: NextFuncti
 
     // for typescript to make sure it's not undefined
     if (!verify.payload) return;
+
+    console.log(verify.payload);
+
+    // get access_token
+    const access_token = await client.getToken(req.body.token);
 
     // get user from database
     let user = await usersDao.getUserByGoogleId(verify.payload.sub);
@@ -209,6 +215,7 @@ async function registerUser(google_payload: TokenPayload) {
 async function verifyGoogleToken(token: string) {
 
     try {
+        console.log(token)
         const ticket = await client.verifyIdToken({
             idToken: token,
             audience: process.env.GOOGLE_CLIENT_ID as string

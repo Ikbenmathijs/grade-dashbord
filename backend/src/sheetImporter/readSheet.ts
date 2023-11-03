@@ -1,50 +1,50 @@
 import {Workbook, Worksheet, Cell, ValueType} from "exceljs";
 import testLayout from "./sheetLayouts/testLayout";
+import testDataLayout from "./sheetLayouts/testDataLayout";
+import Test from "../interfaces/Test/test";
+import { ObjectId } from "mongodb";
+import test from "node:test";
 
 
 
 const workbook = new Workbook();
 
 workbook.xlsx.readFile("./resources/dummy.xlsx").then(() => {
-    const sheet = workbook.getWorksheet("SE1");
+    const sheet = workbook.getWorksheet(testDataLayout.sheetName);
     if (sheet) {
+        for (let startRow = 0; startRow < 10000; startRow += 5) {
+            let sheetCode = sheet.getCell(testDataLayout.sheetCodeRowIndex + startRow, testDataLayout.sheetCodeColumn);
+            if (sheetCode.type == ValueType.Null) {
+                break;
+            }
+            else if (sheetCode.type == ValueType.String) {
 
-        readTestSheet(sheet);
+            } else {
+                throw new Error(`Bladcode op rij ${testDataLayout.sheetCodeRowIndex + startRow} in ${testDataLayout.sheetName} is geen string, maar niet leeg!`);
+            }
+        }
+    } else {
+        throw new Error(`Blad ${testDataLayout.sheetName} niet gevonden!`);
     }
  });
 
 
 
-function readTestSheet(sheet: Worksheet) {
-    try {
-        const totalQuestions = getTotalQuestions(sheet);
-        
-        
-        
-
-
-    } catch (e) {
-        console.log(e);
-    }
+function getTestSheet(workbook: Workbook, sheetCode: string): Worksheet {
+    const sheets = workbook.worksheets;
     
-}
-
-
-function getTotalQuestions(sheet: Worksheet) {
-    try {
-        const firstRow = sheet.getRow(testLayout.firstStudentRow);
-        const firstQuestionColumn = testLayout.firstQuestionColumn;
-        for (let i = firstQuestionColumn; i < 400; i++) {
-            const cell = firstRow.getCell(i);
-
-            if (cell.type !== ValueType.Number) {
-                return i - firstQuestionColumn;
-            }
-        }
-        throw new Error("Total column not found");
-    } catch (e) {
-        console.log(e);
-        throw e;
+    for (let i = 0; i < sheets.length; i++) {
+        const sheetCode = sheets[i].getCell(testLayout.sheetCodeRow, testLayout.sheetCodeColumn);
+        if 
+        
     }
 }
 
+function readTestData(sheet: Worksheet, startRow: number) {
+    let testName = sheet.getCell(testDataLayout.testNameRowIndex + startRow, testDataLayout.testNameColumn).value;
+
+    let testData: Test = {
+        _id: new ObjectId(),
+
+    }
+}
