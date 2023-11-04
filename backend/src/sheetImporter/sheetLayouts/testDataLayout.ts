@@ -16,6 +16,8 @@ const testDataLayout = {
     testVersionRowIndex: 1,
     testNameColumn: 3, // C
     testNameRowIndex: 1,
+    totalQuestionsColumn: 2, // B
+    totalQuestionsRowIndex: 2,
 }
 
 

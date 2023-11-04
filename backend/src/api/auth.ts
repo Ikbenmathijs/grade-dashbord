@@ -78,7 +78,7 @@ export async function apiLoginUser(req: Request, res: Response, next: NextFuncti
 
     // send cookie
     res.cookie("Session", session_id, {
-        secure: process.env.ENV !== "dev",
+        secure: process.env.ENV !== "dev", // http in dev envitonment, https in production
         httpOnly: true,
         expires: session.expires
     });
