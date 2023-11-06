@@ -18,20 +18,13 @@ workbook.xlsx.readFile("./resources/dummy.xlsx").then(() => {
     let tests = [];
     if (sheet) {
         for (let startRow = 0; startRow < 10000; startRow += 5) {
-            let sheetCode = sheet.getCell(testDataLayout.sheetCodeRowIndex + startRow, testDataLayout.sheetCodeColumn);
-            if (sheetCode.type == ValueType.Null) {
-                break;
-            }
-            else if (sheetCode.type == ValueType.String) {
-                const sheet = getTestSheet(workbook, sheetCode.value as string);
-                tests.push(readTestData(sheet, startRow));
-            } else {
-                throw new Error(`Bladcode op rij ${testDataLayout.sheetCodeRowIndex + startRow} in ${testDataLayout.sheetName} is geen string, maar niet leeg!`);
-            }
+            tests.push(readTestData(sheet, startRow));
         }
     } else {
         throw new Error(`Blad ${testDataLayout.sheetName} niet gevonden!`);
     }
+
+    console.log(tests);
  });
 
 
@@ -53,6 +46,9 @@ function getTestSheet(workbook: Workbook, sheetCode: string): Worksheet {
 function readTestData(sheet: Worksheet, startRow: number): {test: Test; questions: Question[]} {
 
     const totalPointsCell = sheet.getCell(testDataLayout.totalPointsRowIndex + startRow, testDataLayout.totalPointsColumn);
+    console.log(sheet.name);
+    console.log(totalPointsCell.type);
+    console.log(totalPointsCell.value);
     if (totalPointsCell.type != ValueType.Number) {
         throw new Error(`Totaal punten op rij ${testDataLayout.totalPointsRowIndex + startRow} in ${testDataLayout.sheetName} is geen nummer! (rij nr: ${testDataLayout.totalPointsRowIndex + startRow}, col nr: ${testDataLayout.totalPointsColumn})`);
     }
@@ -98,34 +94,19 @@ function readTestData(sheet: Worksheet, startRow: number): {test: Test; question
 
 
         let questionNumberCell = sheet.getCell(testDataLayout.questionNumberRowIndex + startRow, currentColumn);
-        if (questionNumberCell.type != ValueType.Number) {
-            throw new Error(`Vraagnummer op rij ${testDataLayout.questionNumberRowIndex + startRow} in ${testDataLayout.sheetName} is geen nummer! (rij nr: ${testDataLayout.questionNumberRowIndex + startRow}, col nr: ${currentColumn})`);
-        }
-        const questionNumber = questionNumberCell.value as number;
+        const questionNumber = getCellValueAsNumber(questionNumberCell, new Error(`Vraagnummer op rij ${testDataLayout.questionNumberRowIndex + startRow} in ${testDataLayout.sheetName} is geen nummer! (rij nr: ${testDataLayout.questionNumberRowIndex + startRow}, col nr: ${currentColumn})`));
 
         let questionPointsCell = sheet.getCell(testDataLayout.questionPointsRowIndex + startRow, currentColumn);
-        if (questionPointsCell.type != ValueType.Number) {
-            throw new Error(`Vraagpunten op rij ${testDataLayout.questionPointsRowIndex + startRow} in ${testDataLayout.sheetName} is geen nummer! (rij nr: ${testDataLayout.questionPointsRowIndex + startRow}, col nr: ${currentColumn})`);
-        }
-        const questionPoints = questionPointsCell.value as number;
+        const questionPoints = getCellValueAsNumber(questionPointsCell, new Error(`Vraagpunten op rij ${testDataLayout.questionPointsRowIndex + startRow} in ${testDataLayout.sheetName} is geen nummer! (rij nr: ${testDataLayout.questionPointsRowIndex + startRow}, col nr: ${currentColumn})`));
 
         let questionDimensionCell = sheet.getCell(testDataLayout.questionDimensionRowIndex + startRow, currentColumn);
-        if (questionDimensionCell.type != ValueType.String) {
-            throw new Error(`Vraagdimensie op rij ${testDataLayout.questionDimensionRowIndex + startRow} in ${testDataLayout.sheetName} is geen string! (rij nr: ${testDataLayout.questionDimensionRowIndex + startRow}, col nr: ${currentColumn})`);
-        }
-        const questionDimension = questionDimensionCell.value as string;
+        const questionDimension = getCellValueAsString(questionDimensionCell, new Error(`Vraagdimensie op rij ${testDataLayout.questionDimensionRowIndex + startRow} in ${testDataLayout.sheetName} is geen string! (rij nr: ${testDataLayout.questionDimensionRowIndex + startRow}, col nr: ${currentColumn})`));
 
         let questionTypeCell = sheet.getCell(testDataLayout.questionTypeRowIndex + startRow, currentColumn);
-        if (questionTypeCell.type != ValueType.String) {
-            throw new Error(`Vraagtype op rij ${testDataLayout.questionTypeRowIndex + startRow} in ${testDataLayout.sheetName} is geen string! (rij nr: ${testDataLayout.questionTypeRowIndex + startRow}, col nr: ${currentColumn})`);
-        }
-        const questionTypeString = questionTypeCell.value as string;
+        const questionTypeString = getCellValueAsString(questionTypeCell, new Error(`Vraagtype op rij ${testDataLayout.questionTypeRowIndex + startRow} in ${testDataLayout.sheetName} is geen string! (rij nr: ${testDataLayout.questionTypeRowIndex + startRow}, col nr: ${currentColumn})`));
 
         let questionDomainCell = sheet.getCell(testDataLayout.questionDomainRowIndex + startRow, currentColumn);
-        if (questionDomainCell.type != ValueType.String) {
-            throw new Error(`Vraagdomein op rij ${testDataLayout.questionDomainRowIndex + startRow} in ${testDataLayout.sheetName} is geen string! (rij nr: ${testDataLayout.questionDomainRowIndex + startRow}, col nr: ${currentColumn})`);
-        }
-        const questionDomainString = questionDomainCell.value as string;
+        const questionDomainString = getCellValueAsString(questionDomainCell, new Error(`Vraagdomein op rij ${testDataLayout.questionDomainRowIndex + startRow} in ${testDataLayout.sheetName} is geen string! (rij nr: ${testDataLayout.questionDomainRowIndex + startRow}, col nr: ${currentColumn})`));
 
 
         let domain: QuestionDomain;
@@ -144,7 +125,7 @@ function readTestData(sheet: Worksheet, startRow: number): {test: Test; question
 
         let questionType: QuestionType;
         try {
-            questionType = letterToQuestionType(questionType);
+            questionType = letterToQuestionType(questionTypeString);
         } catch (e) {
             throw new Error(`Vraagtype op rij ${testDataLayout.questionTypeRowIndex + startRow} in ${testDataLayout.sheetName} is geen geldig vraagtype! (rij nr: ${testDataLayout.questionTypeRowIndex + startRow}, col nr: ${currentColumn})`);
         }
@@ -152,12 +133,38 @@ function readTestData(sheet: Worksheet, startRow: number): {test: Test; question
 
         let question: Question = {
             _id: new ObjectId(),
-            number: questionNumber,
+            test: testData._id,
+            questionNumber: questionNumber,
             points: questionPoints,
             dimension: dimension,
-            type: questionType,
+            questionType: questionType,
             domain: domain
         }
 
+        questions.push(question);
+    }
+
+    return {test: testData, questions: questions};
+}
+
+
+function getCellValueAsNumber(cell: Cell, errorIfInvalidType: Error): number {
+    if (cell.type == ValueType.Number) {
+        return cell.value as number;
+    } else if (cell.type == ValueType.Formula) {
+        return cell.result as number;
+    } else {
+        throw errorIfInvalidType;
+    }
+}
+
+
+function getCellValueAsString(cell: Cell, errorIfInvalidType: Error): string {
+    if (cell.type == ValueType.String) {
+        return cell.value as string;
+    } else if (cell.type == ValueType.Formula) {
+        return cell.result as string;
+    } else {
+        throw errorIfInvalidType;
     }
 }
