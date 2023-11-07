@@ -38,7 +38,7 @@ export async function apiLoginUser(req: Request, res: Response, next: NextFuncti
     console.log(verify.payload);
 
     // get access_token
-    const access_token = await client.getToken(req.body.token);
+    //const access_token = await client.getToken(req.body.token);
 
     // get user from database
     let user = await usersDao.getUserByGoogleId(verify.payload.sub);

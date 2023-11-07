@@ -1,7 +1,7 @@
 
 
 const testDataLayout = {
-    sheetCodeColumn: 1, 
+    sheetCodeColumn: 2, 
     sheetCodeRowIndex: 1,
     sheetName: "Toetsgegevens",
     totalPointsColumn: 5, // E

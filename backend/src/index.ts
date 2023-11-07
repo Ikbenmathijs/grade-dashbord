@@ -8,6 +8,8 @@ import LogLevel from './enums/logLevel';
 import UsersDao from './dao/usersDAO';
 import SessionsDAO from './dao/sessionsDAO';
 import cookieParser from 'cookie-parser';
+import QuestionsDao from './dao/questionsDAO';
+import TestsDao from './dao/testsDAO';
 
 
 /**
@@ -67,6 +69,9 @@ client.connect().catch((e) => {
     // This injects the database connection into the DAOs
     UsersDao.injectDB(client);
     SessionsDAO.injectDB(client);
+    QuestionsDao.injectDB(client);
+    TestsDao.injectDB(client);
+    
 
     
     console.log(`⚡️[server]: Server is running at http://localhost:${port}`);

@@ -6,6 +6,6 @@ export default interface Test {
     name: string;
     totalPoints: number;
     totalQuestions: number;
-    Sheetcode: string;
-    Version: string;
+    sheetCode: string;
+    version: string;
 }

@@ -7,25 +7,88 @@ import Question from "../interfaces/Test/question";
 import QuestionDomain, { stringToQuestionDomain } from "../enums/Test/questionDomain";
 import QuestionDimension, { letterToQuestionDimension } from "../enums/Test/questionDimension";
 import QuestionType, { letterToQuestionType } from "../enums/Test/questionType";
+import TestsDao from "../dao/testsDAO";
+import QuestionsDao from "../dao/questionsDAO";
+
+
+export async function importSpreadsheet() {
+    let {tests, questions} = await readAllTestsAndQuestions();
+
+    for (let i = 0; i < tests.length; i++) {
+
+        const oldTest = await TestsDao.getTestByName(tests[i].name);
+        // check if test already exists
+        if (oldTest) {
+
+            // test already exists, update all questions to use the original ID
+            for (let j = 0; j < questions.length; j++) {
+                if (questions[j].test == tests[i]._id) {
+                    questions[j].test = oldTest._id;
+                }
+            }
+            // change the test object's ID to the original test's ID
+            tests[i]._id = oldTest._id;
+            // if something changed, update the test in the database
+            if (tests[i] !== oldTest) {
+                TestsDao.updateTestById(oldTest._id, tests[i]);
+            }
+        }
+        else {
+            const newId = await TestsDao.insertTest(tests[i]);
+            if (!newId) {
+                throw new Error(`Toets ${tests[i].name} kon niet worden geimporteerd! (database gaf een error tijdens insert toets)`);
+            }
+            tests[i]._id = newId;
+        }
+    }
+
+    for (let i = 0; i < questions.length; i++) {
+        let oldQuestion = await QuestionsDao.getQuestionByTestIdAndQuestionNumber(questions[i].test, questions[i].questionNumber);
+        // check if question already exists
+        if (oldQuestion) {
+            // questions already exists, update the question to use the original ID
+            questions[i]._id = oldQuestion._id;
+            // if something changed, update the question
+            if (questions[i] !== oldQuestion) {
+                QuestionsDao.updateQuestionById(oldQuestion._id, questions[i]);
+            }
+        } else {
+            const newId = await QuestionsDao.insertQuestion(questions[i]);
+            if (!newId) {
+                throw new Error(`Vraag ${questions[i].questionNumber} van toets ${tests[i].name} kon niet worden geimporteerd! (database gaf een error tijdens insert vraag)`);
+            }
+            questions[i]._id = newId;
+        }
+    }
+
+
+}
 
 
 
 
-const workbook = new Workbook();
-
-workbook.xlsx.readFile("./resources/dummy.xlsx").then(() => {
+async function readAllTestsAndQuestions(): Promise<{tests: Test[], questions: Question[]}> {
+    const workbook = new Workbook();
+    await workbook.xlsx.readFile("./resources/dummy.xlsx");
     const sheet = workbook.getWorksheet(testDataLayout.sheetName);
     let tests = [];
+    let questions = [];
     if (sheet) {
         for (let startRow = 0; startRow < 10000; startRow += 5) {
-            tests.push(readTestData(sheet, startRow));
+            const sheetCodeCell = sheet.getCell(testDataLayout.sheetCodeRowIndex + startRow, testDataLayout.sheetCodeColumn);
+            if (sheetCodeCell.type == ValueType.Null) {
+                break;
+            }
+            const result = readTestData(sheet, startRow);
+            tests.push(result.test);
+            questions.push(...result.questions);
         }
     } else {
         throw new Error(`Blad ${testDataLayout.sheetName} niet gevonden!`);
     }
+    return {tests: tests, questions: questions};
+}
 
-    console.log(tests);
- });
 
 
 
@@ -46,44 +109,36 @@ function getTestSheet(workbook: Workbook, sheetCode: string): Worksheet {
 function readTestData(sheet: Worksheet, startRow: number): {test: Test; questions: Question[]} {
 
     const totalPointsCell = sheet.getCell(testDataLayout.totalPointsRowIndex + startRow, testDataLayout.totalPointsColumn);
-    console.log(sheet.name);
-    console.log(totalPointsCell.type);
-    console.log(totalPointsCell.value);
-    if (totalPointsCell.type != ValueType.Number) {
-        throw new Error(`Totaal punten op rij ${testDataLayout.totalPointsRowIndex + startRow} in ${testDataLayout.sheetName} is geen nummer! (rij nr: ${testDataLayout.totalPointsRowIndex + startRow}, col nr: ${testDataLayout.totalPointsColumn})`);
-    }
-    const totalPoints = totalPointsCell.value as number;
+
+    const totalPoints = getCellValueAsNumber(totalPointsCell, new Error(`Totaal punten op rij ${testDataLayout.totalPointsRowIndex + startRow} in ${testDataLayout.sheetName} is geen nummer! (rij nr: ${testDataLayout.totalPointsRowIndex + startRow}, col nr: ${testDataLayout.totalPointsColumn})`));
 
     const sheetCodeCell = sheet.getCell(testDataLayout.sheetCodeRowIndex + startRow, testDataLayout.sheetCodeColumn);
-    if (sheetCodeCell.type != ValueType.String) {
-        throw new Error(`Bladcode op rij ${testDataLayout.sheetCodeRowIndex + startRow} in ${testDataLayout.sheetName} is geen string! (rij nr: ${testDataLayout.sheetCodeRowIndex + startRow}, col nr: ${testDataLayout.sheetCodeColumn})`);
-    }
-    const sheetCode = sheetCodeCell.value as string;
+    const sheetCode = getCellValueAsString(sheetCodeCell, new Error(`Bladcode op rij ${testDataLayout.sheetCodeRowIndex + startRow} in ${testDataLayout.sheetName} is geen string! (rij nr: ${testDataLayout.sheetCodeRowIndex + startRow}, col nr: ${testDataLayout.sheetCodeColumn})`));
 
     const testNameCell = sheet.getCell(testDataLayout.testNameRowIndex + startRow, testDataLayout.testNameColumn);
-    if (testNameCell.type != ValueType.String) {
-        throw new Error(`Toetsnaam op rij ${testDataLayout.testNameRowIndex + startRow} in ${testDataLayout.sheetName} is geen string! (rij nr: ${testDataLayout.testNameRowIndex + startRow}, col nr: ${testDataLayout.testNameColumn})`);
-    }
-    const testName = testNameCell.value as string;
+    const testName = getCellValueAsString(testNameCell, new Error(`Testnaam op rij ${testDataLayout.testNameRowIndex + startRow} in ${testDataLayout.sheetName} is geen string! (rij nr: ${testDataLayout.testNameRowIndex + startRow}, col nr: ${testDataLayout.testNameColumn})`));
 
     const versionCell = sheet.getCell(testDataLayout.testVersionRowIndex + startRow, testDataLayout.testVersionColumn);
-    if (versionCell.type != ValueType.String && versionCell.type != ValueType.Number) {
+    let version: string;
+    if (versionCell.type == ValueType.String || versionCell.type == ValueType.Number) {
+        version = `${versionCell.value}`;
+
+    } else if (versionCell.type == ValueType.Formula) {
+        version = `${versionCell.result}`;
+    } else {
         throw new Error(`Versie op rij ${testDataLayout.testVersionRowIndex + startRow} in ${testDataLayout.sheetName} is geen string of nummer! (rij nr: ${testDataLayout.testVersionRowIndex + startRow}, col nr: ${testDataLayout.testVersionColumn})`);
+
     }
-    const version = `${versionCell.value}`;
 
     const totalQuestionsCell = sheet.getCell(testDataLayout.totalQuestionsRowIndex + startRow, testDataLayout.totalQuestionsColumn);
-    if (totalQuestionsCell.type != ValueType.Number) {
-        throw new Error(`Aantal vragen op rij ${testDataLayout.totalQuestionsRowIndex + startRow} in ${testDataLayout.sheetName} is geen nummer! (rij nr: ${testDataLayout.totalQuestionsRowIndex + startRow}, col nr: ${testDataLayout.totalQuestionsColumn})`);
-    }
-    const totalQuestions = totalQuestionsCell.value as number;
+    const totalQuestions = getCellValueAsNumber(totalQuestionsCell, new Error(`Totaal vragen op rij ${testDataLayout.totalQuestionsRowIndex + startRow} in ${testDataLayout.sheetName} is geen nummer! (rij nr: ${testDataLayout.totalQuestionsRowIndex + startRow}, col nr: ${testDataLayout.totalQuestionsColumn})`));
 
     let testData: Test = {
         _id: new ObjectId(),
         name: testName,
-        Sheetcode: sheetCode,
+        sheetCode: sheetCode,
         totalPoints: totalPoints,
-        Version: version,
+        version: version,
         totalQuestions: totalQuestions
     }
 
