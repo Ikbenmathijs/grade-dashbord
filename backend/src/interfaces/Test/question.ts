@@ -12,4 +12,5 @@ export default interface Question {
     domain: QuestionDomain;
     dimension: QuestionDimension;
     questionType: QuestionType;
+    testName: string;
 }

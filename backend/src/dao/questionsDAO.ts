@@ -33,7 +33,7 @@ export default class QuestionsDao {
         try {
             return await questions.findOne({_id: id});
         } catch (e) {
-            log(LogLevel.Debug, `Unable to get test: ${e}`);
+            log(LogLevel.Debug, `Unable to get question: ${e}`);
             return null;
         }
     }
@@ -43,7 +43,7 @@ export default class QuestionsDao {
         try {
             return await questions.updateOne({_id: id}, {$set: question});
         } catch (e) {
-            log(LogLevel.Debug, `Unable to update test: ${e}`);
+            log(LogLevel.Debug, `Unable to update question: ${e}`);
             return null;
         }
     }

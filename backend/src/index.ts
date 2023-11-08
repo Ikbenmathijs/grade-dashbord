@@ -10,6 +10,7 @@ import SessionsDAO from './dao/sessionsDAO';
 import cookieParser from 'cookie-parser';
 import QuestionsDao from './dao/questionsDAO';
 import TestsDao from './dao/testsDAO';
+import QuestionAnswersDao from './dao/questionAnswersDAO';
 
 
 /**
@@ -71,6 +72,7 @@ client.connect().catch((e) => {
     SessionsDAO.injectDB(client);
     QuestionsDao.injectDB(client);
     TestsDao.injectDB(client);
+    QuestionAnswersDao.injectDB(client);
     
 
     

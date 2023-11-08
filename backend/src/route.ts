@@ -20,7 +20,6 @@ router.route("/auth/logout").post(apiLogoutUser);
 router.route("/sheets/import").post(async (req: express.Request, res: express.Response, next: express.NextFunction) => {
     try {
         await importSpreadsheet();
-        console.log(99999999999999)
         res.status(200).json();
     } catch (e) {
         res.status(500).json({error: e});

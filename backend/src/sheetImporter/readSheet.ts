@@ -9,10 +9,11 @@ import QuestionDimension, { letterToQuestionDimension } from "../enums/Test/ques
 import QuestionType, { letterToQuestionType } from "../enums/Test/questionType";
 import TestsDao from "../dao/testsDAO";
 import QuestionsDao from "../dao/questionsDAO";
-
+import QuestionAnswer from "../interfaces/Test/questionAnswer";
+import QuestionAnswersDao from "../dao/questionAnswersDAO";
 
 export async function importSpreadsheet() {
-    let {tests, questions} = await readAllTestsAndQuestions();
+    let {tests, questions, questionAnswers} = await readSheet();
 
     for (let i = 0; i < tests.length; i++) {
 
@@ -55,11 +56,33 @@ export async function importSpreadsheet() {
         } else {
             const newId = await QuestionsDao.insertQuestion(questions[i]);
             if (!newId) {
-                throw new Error(`Vraag ${questions[i].questionNumber} van toets ${tests[i].name} kon niet worden geimporteerd! (database gaf een error tijdens insert vraag)`);
+                throw new Error(`Vraag ${questions[i].questionNumber} van toets ${questions[i].testName} kon niet worden geimporteerd! (database gaf een error tijdens insert vraag)`);
             }
             questions[i]._id = newId;
         }
     }
+
+
+    for (let i = 0; i < questionAnswers.length; i++) {
+        let oldQuestionAnswer = await QuestionAnswersDao.getQuestionAnswerByTestIdAndQuestionNumberAndEmailAndVersion(questionAnswers[i].test, questionAnswers[i].questionNumber, questionAnswers[i].email, questionAnswers[i].version);
+        // check if question already exists
+        if (oldQuestionAnswer) {
+            // question answer already exists, update the question to use the original ID
+            questionAnswers[i]._id = oldQuestionAnswer._id;
+            // if something changed, update the question
+            if (questionAnswers[i] !== oldQuestionAnswer) {
+                QuestionAnswersDao.updateQuestionAnswerById(oldQuestionAnswer._id, questionAnswers[i]);
+            }
+        } else {
+            const newId = await QuestionAnswersDao.insertQuestionAnswer(questionAnswers[i]);
+            if (!newId) {
+                throw new Error(`Antwoord van vraag ${questionAnswers[i].questionNumber} van toets ${questionAnswers[i].testName} van leerling met email ${questionAnswers[i].email} kon niet worden geimporteerd! (database gaf een error tijdens insert antwoord)`);
+            }
+            questionAnswers[i]._id = newId;
+        
+        }
+    }
+    
 
 
 }
@@ -67,12 +90,17 @@ export async function importSpreadsheet() {
 
 
 
-async function readAllTestsAndQuestions(): Promise<{tests: Test[], questions: Question[]}> {
+
+
+async function readSheet(): Promise<{tests: Test[], questions: Question[], questionAnswers: QuestionAnswer[]}> {
     const workbook = new Workbook();
     await workbook.xlsx.readFile("./resources/dummy.xlsx");
     const sheet = workbook.getWorksheet(testDataLayout.sheetName);
-    let tests = [];
-    let questions = [];
+
+    let tests: Test[] = [];
+    let questions: Question[] = [];
+    let questionAnswers: QuestionAnswer[] = [];
+
     if (sheet) {
         for (let startRow = 0; startRow < 10000; startRow += 5) {
             const sheetCodeCell = sheet.getCell(testDataLayout.sheetCodeRowIndex + startRow, testDataLayout.sheetCodeColumn);
@@ -86,25 +114,81 @@ async function readAllTestsAndQuestions(): Promise<{tests: Test[], questions: Qu
     } else {
         throw new Error(`Blad ${testDataLayout.sheetName} niet gevonden!`);
     }
-    return {tests: tests, questions: questions};
-}
 
+    // loops through all tests (i)
+    for (let i = 0; i < tests.length; i++) {
+        const sheetCode = tests[i].sheetCode;
+        const sheet = getSheetFromSheetCode(workbook, sheetCode);
+        const totalQuestions = tests[i].totalQuestions;
+        
+        // loops through all students (j) per test sheet (i)
+        for (let j = 0; j < 1000; j++) {
+            const emailCell = sheet.getCell(testLayout.firstStudentRow + j, testLayout.emailColumn);
+            let email: string;
+            try {
+                email = getCellValueAsString(emailCell);
+            } catch (e) {
+                break;
+            }
 
+            const versionCell = sheet.getCell(testLayout.firstStudentRow + j, testLayout.versionColumn);
+            const version = getCellValueAsString(versionCell, new Error(`Versie op (rij: ${testLayout.firstStudentRow + j} column ${testLayout.versionColumn}) op blad ${sheet.name} met bladcode ${sheetCode} voor leerling met email ${email} is geen string!`));
+            // check if version matches, if not then continue to the next student, this student will get taken care of by the other iteration(s) of the tests
+            if (version !== tests[i].version) {
+                continue;
+            }
 
+            // loops through all points per question (k) per student (j) per test sheet (i)
+            for (let k = 0; k < 1000; k++) {
+                const questionPointsCell = sheet.getCell(testLayout.firstStudentRow + j, testLayout.firstQuestionColumn + k);
+                
+                let points: number;
+                try {
+                    points = getCellValueAsNumber(questionPointsCell);
+                } catch (e) {
+                    break;
+                }
+                
+                const questionAnswer: QuestionAnswer = {
+                    _id: new ObjectId(),
+                    test: tests[i]._id,
+                    questionNumber: k + 1,
+                    email: email,
+                    points: points,
+                    testName: tests[i].name,
+                    version: tests[i].version
+                }
 
-function getTestSheet(workbook: Workbook, sheetCode: string): Worksheet {
-    const sheets = workbook.worksheets;
-    
-    for (let i = 0; i < sheets.length; i++) {
-        const sheetCode = sheets[i].getCell(testLayout.sheetCodeRow, testLayout.sheetCodeColumn);
-        if (sheetCode.type == ValueType.String) {
-            if (sheetCode.value == sheetCode) {
-                return sheets[i];
+                questionAnswers.push(questionAnswer);
             }
         }
     }
+
+    return {tests: tests, questions: questions, questionAnswers: questionAnswers};
+}
+
+
+
+function getSheetFromSheetCode(workbook: Workbook, sheetCode: String): Worksheet {
+
+    for (let i = 0; i < workbook.worksheets.length; i++) {
+        const sheet = workbook.worksheets[i];
+        const sheetCodeCell = sheet.getCell(testLayout.sheetCodeRow, testLayout.sheetCodeColumn);
+        let sheetCodeString: string;
+        try {
+            sheetCodeString = getCellValueAsString(sheetCodeCell);
+        } catch (e) {
+            continue;
+        }
+
+        if (sheetCodeString === sheetCode) {
+            return sheet;
+        }
+    }
+
     throw new Error(`Blad met bladcode ${sheetCode} niet gevonden!`);
 }
+
 
 function readTestData(sheet: Worksheet, startRow: number): {test: Test; questions: Question[]} {
 
@@ -193,7 +277,8 @@ function readTestData(sheet: Worksheet, startRow: number): {test: Test; question
             points: questionPoints,
             dimension: dimension,
             questionType: questionType,
-            domain: domain
+            domain: domain,
+            testName: testData.name
         }
 
         questions.push(question);
@@ -203,23 +288,33 @@ function readTestData(sheet: Worksheet, startRow: number): {test: Test; question
 }
 
 
-function getCellValueAsNumber(cell: Cell, errorIfInvalidType: Error): number {
+function getCellValueAsNumber(cell: Cell, errorIfInvalidType?: Error): number {
     if (cell.type == ValueType.Number) {
         return cell.value as number;
     } else if (cell.type == ValueType.Formula) {
         return cell.result as number;
     } else {
-        throw errorIfInvalidType;
+        if (errorIfInvalidType) {
+            throw errorIfInvalidType;
+        } else {
+            throw new Error(`Cell (row: ${cell.row} col: ${cell.col}) is not a number!`);
+        }
     }
 }
 
 
-function getCellValueAsString(cell: Cell, errorIfInvalidType: Error): string {
+function getCellValueAsString(cell: Cell, errorIfInvalidType?: Error): string {
     if (cell.type == ValueType.String) {
         return cell.value as string;
     } else if (cell.type == ValueType.Formula) {
         return cell.result as string;
+    } else if (cell.type == ValueType.Number) {
+        return `${cell.value}`;
     } else {
-        throw errorIfInvalidType;
+        if (errorIfInvalidType) {
+            throw errorIfInvalidType;
+        } else {
+            throw new Error(`Cell (row: ${cell.row} col: ${cell.col}) is not a string!`);
+        }
     }
 }
