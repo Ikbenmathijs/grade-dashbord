@@ -7,4 +7,6 @@ export default interface QuestionAnswer {
     questionNumber: number;
     email: string;
     points: number;
+    testName: string;
+    version: string;
 }

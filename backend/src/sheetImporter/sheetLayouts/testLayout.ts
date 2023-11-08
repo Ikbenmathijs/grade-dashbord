@@ -1,13 +1,15 @@
 
 const testLayout = {
     firstStudentRow: 17,
-    studentNameColumn: 4, // D
+    studentNameColumn: 5, // E
     clusterClassColumn: 3, //
     stemClassColumn: 1, // A
-    totalPointsColumn: 7, // G
-    firstQuestionColumn: 8, // H
+    totalPointsColumn: 8, // H
+    firstQuestionColumn: 9, // I
     sheetCodeColumn: 1, // A
-    sheetCodeRow: 1
+    sheetCodeRow: 1,
+    emailColumn: 4, // D
+    versionColumn: 2, // B
 };
 
 
