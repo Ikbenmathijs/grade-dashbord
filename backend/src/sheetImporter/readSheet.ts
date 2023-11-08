@@ -9,10 +9,10 @@ import QuestionDimension, { letterToQuestionDimension } from "../enums/Test/ques
 import QuestionType, { letterToQuestionType } from "../enums/Test/questionType";
 import TestsDao from "../dao/testsDAO";
 import QuestionsDao from "../dao/questionsDAO";
-
+import QuestionAnswer from "../interfaces/Test/questionAnswer";
 
 export async function importSpreadsheet() {
-    let {tests, questions} = await readAllTestsAndQuestions();
+    let {tests, questions} = await readSheet();
 
     for (let i = 0; i < tests.length; i++) {
 
@@ -62,12 +62,15 @@ export async function importSpreadsheet() {
     }
 
 
+
 }
 
 
 
 
-async function readAllTestsAndQuestions(): Promise<{tests: Test[], questions: Question[]}> {
+
+
+async function readSheet(): Promise<{tests: Test[], questions: Question[], answers: QuestionAnswer}> {
     const workbook = new Workbook();
     await workbook.xlsx.readFile("./resources/dummy.xlsx");
     const sheet = workbook.getWorksheet(testDataLayout.sheetName);
@@ -86,6 +89,23 @@ async function readAllTestsAndQuestions(): Promise<{tests: Test[], questions: Qu
     } else {
         throw new Error(`Blad ${testDataLayout.sheetName} niet gevonden!`);
     }
+
+
+    for (let i = 0; i < tests.length; i++) {
+        const sheetCode = tests[i].sheetCode;
+        for (let j = 0; j < workbook.worksheets.length; j++) {
+            const sheet = workbook.worksheets[j];
+            const sheetCodeCell = sheet.getCell(testLayout.sheetCodeRow, testLayout.sheetCodeColumn);
+            try {
+                const sheetCodeString = getCellValueAsString(sheetCodeCell);
+            } catch (e) {
+                continue;
+            }
+
+        }
+    }
+
+
     return {tests: tests, questions: questions};
 }
 
@@ -203,23 +223,31 @@ function readTestData(sheet: Worksheet, startRow: number): {test: Test; question
 }
 
 
-function getCellValueAsNumber(cell: Cell, errorIfInvalidType: Error): number {
+function getCellValueAsNumber(cell: Cell, errorIfInvalidType?: Error): number {
     if (cell.type == ValueType.Number) {
         return cell.value as number;
     } else if (cell.type == ValueType.Formula) {
         return cell.result as number;
     } else {
-        throw errorIfInvalidType;
+        if (errorIfInvalidType) {
+            throw errorIfInvalidType;
+        } else {
+            throw new Error(`Cell (row: ${cell.row} col: ${cell.col}) is not a number!`);
+        }
     }
 }
 
 
-function getCellValueAsString(cell: Cell, errorIfInvalidType: Error): string {
+function getCellValueAsString(cell: Cell, errorIfInvalidType?: Error): string {
     if (cell.type == ValueType.String) {
         return cell.value as string;
     } else if (cell.type == ValueType.Formula) {
         return cell.result as string;
     } else {
-        throw errorIfInvalidType;
+        if (errorIfInvalidType) {
+            throw errorIfInvalidType;
+        } else {
+            throw new Error(`Cell (row: ${cell.row} col: ${cell.col}) is not a string!`);
+        }
     }
 }
