@@ -80,6 +80,7 @@ export async function apiLoginUser(req: Request, res: Response, next: NextFuncti
     res.cookie("Session", session_id, {
         secure: process.env.ENV !== "dev", // http in dev envitonment, https in production
         httpOnly: true,
+        sameSite: "lax",
         expires: session.expires
     });
 
@@ -172,7 +173,7 @@ async function registerUser(google_payload: TokenPayload) {
         throw err;
     }
 
-    if (!google_payload.email.endsWith("@fiorettileerling.nl") || 
+    /*if (!google_payload.email.endsWith("@fiorettileerling.nl") || 
         !google_payload.email.endsWith("@fioretti.nl") || 
         !google_payload.email.endsWith("@sft-vo.nl")) {
 
@@ -181,7 +182,7 @@ async function registerUser(google_payload: TokenPayload) {
             code: 403
         }
         throw err;
-    }
+    }*/ // temp comment
 
     const userObj: User = {
         _id: new ObjectId(),
