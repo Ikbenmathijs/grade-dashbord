@@ -1,6 +1,7 @@
 import express from 'express';
 import {apiLoginUser, apiVerifySession, apiLogoutUser} from './api/auth';
 import { importSpreadsheet } from './sheetImporter/readSheet';
+import { apiGetTestResults } from './api/testResults';
 
 /**
  * This file contains all the routes for the API
@@ -16,6 +17,8 @@ router.route("/auth/login").post(apiLoginUser);
 router.route("/auth/verify").post(apiVerifySession);
 
 router.route("/auth/logout").post(apiLogoutUser);
+
+router.route("/testResults").get(apiGetTestResults);
 
 router.route("/sheets/import").post(async (req: express.Request, res: express.Response, next: express.NextFunction) => {
     try {

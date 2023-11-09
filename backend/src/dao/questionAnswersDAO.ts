@@ -67,7 +67,8 @@ export default class QuestionAnswersDao {
 
     static async getQuestionAnswersByEmail(email: string) {
         try {
-            return await questionsAnswers.find({email: email}).toArray();
+            console.log(email);
+            return await questionsAnswers.find({email: "MathijsM2006@gmail.com"}).toArray();
         } catch (e) {
             log(LogLevel.Debug, `Unable to get question answers: ${e}`);
             return null;

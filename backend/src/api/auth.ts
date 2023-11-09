@@ -251,13 +251,20 @@ export async function verifySession(sessionId: string): Promise<Boolean> {
 export async function getUserFromSessionCookie(req: Request) {
     let cookie = req.cookies["Session"];
     if (!cookie) return undefined;
-
+    console.log(1);
+ 
     const session = await SessionsDAO.getSessionById(new UUID(cookie));
     if (!session) return undefined;
+    console.log(2);
+
     if (session.expires < new Date()) return undefined;
+    console.log(3);
+
 
     const user = await usersDao.getUserById(session.userId);
     if (!user) return undefined;
+    console.log(4);
+
 
     return user;
 }
