@@ -117,6 +117,7 @@ export async function apiVerifySession(req: Request, res: Response, next: NextFu
     res.status(200).json();
 }
 
+
 /**
  * Invalidades a user's session ID, clearing their session cookie and thus logging them out.
  * @param req Express request
@@ -235,7 +236,7 @@ async function verifyGoogleToken(token: string) {
  * @param sessionId Session ID
  * @returns Boolean
  */
-async function verifySession(sessionId: string): Promise<Boolean> {
+export async function verifySession(sessionId: string): Promise<Boolean> {
 
     const session = await SessionsDAO.getSessionById(new UUID(sessionId));
 
@@ -244,4 +245,19 @@ async function verifySession(sessionId: string): Promise<Boolean> {
     if (session.expires < new Date()) return false;
 
     return true;
+}
+
+
+export async function getUserFromSessionCookie(req: Request) {
+    let cookie = req.cookies["Session"];
+    if (!cookie) return undefined;
+
+    const session = await SessionsDAO.getSessionById(new UUID(cookie));
+    if (!session) return undefined;
+    if (session.expires < new Date()) return undefined;
+
+    const user = await usersDao.getUserById(session.userId);
+    if (!user) return undefined;
+
+    return user;
 }

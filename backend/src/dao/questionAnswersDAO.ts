@@ -64,4 +64,13 @@ export default class QuestionAnswersDao {
             return null;
         }
     }
+
+    static async getQuestionAnswersByEmail(email: string) {
+        try {
+            return await questionsAnswers.find({email: email}).toArray();
+        } catch (e) {
+            log(LogLevel.Debug, `Unable to get question answers: ${e}`);
+            return null;
+        }
+    }
 }
