@@ -12,10 +12,8 @@ import usersDao from "../dao/usersDAO";
 import { ObjectId } from "mongodb";
 
 export async function apiGetTestResults(req: Request, res: Response, next: NextFunction) {
-    //let user = await getUserFromSessionCookie(req);
-    const user = await usersDao.getUserById(new ObjectId("654baa7a3f3811ee9ecbab33"));
+    let user = await getUserFromSessionCookie(req);
 
-    console.log("hello");
     if (!user) {
         res.status(401).json({error: "Je bent niet ingelogd"});
         return;
@@ -28,13 +26,11 @@ export async function apiGetTestResults(req: Request, res: Response, next: NextF
         return;
     }
 
-    console.log(questionAnswers);
     let finalQuestionAnswers = questionAnswers;
 
     let tests: Test[] = [];
     for (let i = 0; i < questionAnswers.length; i++) {
         if (tests.find(test => test._id.equals(questionAnswers[i].test))) { 
-            console.log("continue")
             continue;
         }
         const test = await TestsDao.getTestById(questionAnswers[i].test);

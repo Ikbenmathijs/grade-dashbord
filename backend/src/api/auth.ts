@@ -35,7 +35,6 @@ export async function apiLoginUser(req: Request, res: Response, next: NextFuncti
     // for typescript to make sure it's not undefined
     if (!verify.payload) return;
 
-    console.log(verify.payload);
 
     // get access_token
     //const access_token = await client.getToken(req.body.token);
@@ -108,13 +107,21 @@ export async function apiVerifySession(req: Request, res: Response, next: NextFu
     }
 
     // check if session is valid
-    if (!verifySession(sessionCookie)) {
+    const session = await getValidSession(sessionCookie);
+    if (!session) {
         res.status(401).json({error: "Je sessie is verlopen of bestaat niet"});
         return;
     }
 
+    // session is valid, get user
+    const user = await usersDao.getUserById(session.userId);
+    if (!user) {
+        res.status(500).json({error: "Niet gelukt om gebruiker te vinden"});
+        return;
+    }
+
     // success
-    res.status(200).json();
+    res.status(200).json(user);
 }
 
 
@@ -137,7 +144,7 @@ export async function apiLogoutUser(req: Request, res: Response, next: NextFunct
     }
 
     // check if session is valid
-    if (!verifySession(sessionCookie)) {
+    if (!await getValidSession(sessionCookie)) {
         res.status(401).json({error: "Je was al uitgelogd (je sessie was verlopen of bestond niet)"});
         return;
     }
@@ -189,8 +196,8 @@ async function registerUser(google_payload: TokenPayload) {
         _id: new ObjectId(),
         googleId: google_payload.sub,
         email: google_payload.email,
-        first_name: google_payload.given_name,
-        last_name: google_payload.family_name,
+        firstName: google_payload.given_name,
+        lastName: google_payload.family_name,
         createdAt: new Date()
     }
 
@@ -217,7 +224,6 @@ async function registerUser(google_payload: TokenPayload) {
 async function verifyGoogleToken(token: string) {
 
     try {
-        console.log(token)
         const ticket = await client.verifyIdToken({
             idToken: token,
             audience: process.env.GOOGLE_CLIENT_ID as string
@@ -232,38 +238,34 @@ async function verifyGoogleToken(token: string) {
 }
 
 /**
- * Checks if the session is valid.
+ * Checks if a session is valid, and if so return the session
  * @param sessionId Session ID
  * @returns Boolean
  */
-export async function verifySession(sessionId: string): Promise<Boolean> {
+export async function getValidSession(sessionId: string): Promise<Session | null> {
 
     const session = await SessionsDAO.getSessionById(new UUID(sessionId));
 
-    if (!session) return false;
+    if (!session) return null;
 
-    if (session.expires < new Date()) return false;
+    if (session.expires < new Date()) return null;
 
-    return true;
+    return session;
 }
 
 
 export async function getUserFromSessionCookie(req: Request) {
     let cookie = req.cookies["Session"];
     if (!cookie) return undefined;
-    console.log(1);
  
     const session = await SessionsDAO.getSessionById(new UUID(cookie));
     if (!session) return undefined;
-    console.log(2);
 
     if (session.expires < new Date()) return undefined;
-    console.log(3);
 
 
     const user = await usersDao.getUserById(session.userId);
     if (!user) return undefined;
-    console.log(4);
 
 
     return user;
