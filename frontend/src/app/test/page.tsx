@@ -39,12 +39,36 @@ export default function TestPage() {
   }
 
     return (
+      
       <div>
-        <div className="bg-white rounded-lg p-7 w-1/4 m-16">
-          <b className="text-slate-700 text-2xl">Welkom {name}!</b>
-          <p className="text-slate-500">Dashbord van {fullName}</p>
+        <div className="flex flex-col h-screen">
+        {/* Bovenste rij */}
+          <div className="flex justify-between">
+        {/* Linkerdeel */}
+          <div className="bg-white rounded-lg p-7 w-1/4 m-10 mb-2">
+            <b className="text-slate-700 text-2xl">Welkom {name}!</b>
+            <p className="text-slate-500">Dashbord van {fullName}</p>
+          </div>
+          
+
+        {/* Rechterdeel */}
+          <div className="bg-white rounded-lg p-5 w-1/6 m-10">
+            <p className="text-slate-500 text-right">Scheikunde</p>
+          </div>
+          </div>
+
+        {/* Onderste vak linksonder */}
+          <div className="bg-white rounded-lg p-5 w-1/6 m-10 mt-4">
+            <p className="text-slate-500">Je hebt nog ... dagen tot de volgende toets.</p>
+          </div>
+          
         </div>
+
         <CheckLogin onSuccess={onUserFetched} />
+        
+        
+
+        
 
         <h1>Test page</h1>
         <p>Only accessable to logged in users!</p>
