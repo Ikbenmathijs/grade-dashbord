@@ -52,8 +52,8 @@ export default function TestPage() {
           
 
         {/* Rechterdeel */}
-          <div className="bg-white rounded-lg p-5 w-1/6 m-10">
-            <p className="text-slate-500 text-right">Scheikunde</p>
+          <div className="bg-white rounded-lg p-5 w-1/6 m-10 flex-row-reverse">
+            <p className="text-slate-500 text-right text-lg">Scheikunde</p>
           </div>
           </div>
 
