@@ -44,25 +44,39 @@ export default function TestPage() {
         <div className="flex flex-col h-screen">
         {/* Bovenste rij */}
           <div className="flex justify-between">
-        {/* Linkerdeel */}
-          <div className="bg-white rounded-lg p-7 w-1/4 m-10 mb-2">
-            <b className="text-slate-700 text-2xl">Welkom {name}!</b>
-            <p className="text-slate-500">Dashbord van {fullName}</p>
-          </div>
+            <div className="bg-white rounded-lg p-7 w-1/4 m-10 mb-2">
+              <b className="text-slate-700 text-2xl">Welkom {name}!</b>
+              <p className="text-slate-500">Dashbord van {fullName}</p>
+            </div>
           
-
-        {/* Rechterdeel */}
-          <div className="bg-white rounded-lg p-5 w-1/6 m-10 flex-row-reverse">
-            <p className="text-slate-500 text-right text-lg">Scheikunde</p>
-          </div>
+            <div className="bg-white rounded-lg p-5 w-1/6 h-16 m-10 mb-6 flex-row-reverse">
+              <p className="text-slate-500 text-right text-lg">Scheikunde</p>
+            </div>
           </div>
 
-        {/* Onderste vak linksonder */}
-          <div className="bg-white rounded-lg p-5 w-1/6 m-10 mt-4">
-            <p className="text-slate-500">Je hebt nog ... dagen tot de volgende toets.</p>
+        {/* 2e regel */}
+          <div className="flex justify-between">
+            <div className="bg-white rounded-lg p-5 w-1/5 h-24 m-10 mb-2">
+              <p className="text-slate-500">Je hebt nog ... dagen tot de volgende toets.</p>
+            </div>
+
+            <div className="bg-white p-7 w-1/3 h-56 m-10 mt-2">
+              <p className="text-slate-500">Diagram 1</p>
+            </div>
           </div>
+            
+          {/* 3e regel*/}  
+          <div className="flex justify-between">
+            <div className="bg-white rounded-lg p-5 w-1/5 h-50 m-10 mt-2">
+              <p className="text-slate-500">De volgende hoofdstukken en dimensies:</p>
+            </div>
+
+            <div className="bg-white p-7 w-1/3 h-56 m-10 mt-2">
+              <p className="text-slate-500">Diagram 2</p>
+            </div>
+          </div> 
           
-        </div>
+      </div>
 
         <CheckLogin onSuccess={onUserFetched} />
         
