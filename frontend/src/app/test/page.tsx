@@ -42,11 +42,11 @@ export default function TestPage() {
       
       <div>
         <div className="flex flex-col h-screen">
-        {/* Bovenste rij */}
+        {/* 1e regel */}
           <div className="flex justify-between">
             <div className="bg-white rounded-lg p-7 w-1/4 m-10 mb-2">
               <b className="text-slate-700 text-2xl">Welkom {name}!</b>
-              <p className="text-slate-500">Dashbord van {fullName}</p>
+              <p className="text-slate-500">Dashboard van {fullName}</p>
             </div>
           
             <div className="bg-white rounded-lg p-5 w-1/6 h-16 m-10 mb-6 flex-row-reverse">
@@ -76,6 +76,17 @@ export default function TestPage() {
             </div>
           </div> 
           
+          {/* 4e regel*/}  
+          <div className="flex justify-between">
+            <div className="bg-white rounded-lg p-5 w-1/2 h-60 m-10 mt-2">
+              <p className="text-slate-500">Resultaten in percentages</p>
+            </div>
+
+            <div className="bg-white p-7 w-1/3 h-56 m-10 mt-2">
+              <p className="text-slate-500">Diagram 3</p>
+            </div>
+          </div> 
+
       </div>
 
         <CheckLogin onSuccess={onUserFetched} />
