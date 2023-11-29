@@ -5,12 +5,16 @@ import LogoutButton from "@/components/logoutButton"
 import { useEffect, useState } from "react"
 import axios from "axios";
 import User from "@/interfaces/user";
+import { TestResult } from "@/interfaces/testResult";
+import QuestionDomain from "@/enums/Test/questionDomain";
 
 export default function TestPage() {
 
   const [text, setText] = useState("");
   const [name, setName] = useState("");
   const [fullName, setFullName] = useState("");
+  const [domainChartLabels, setDomainChartLabels] = useState([] as string[]);
+  const [domainChartData, setDomainChartData] = useState([] as number[]);
 
   useEffect(() => {
     axios.get(`${process.env.NEXT_PUBLIC_API_URL}/testResults`, {withCredentials: true}).then((response) => {
@@ -21,6 +25,24 @@ export default function TestPage() {
       //throw e;
     });
   }, []);
+
+
+  function processResults(results: TestResult[]) {
+    
+    setDomainChartLabels(["Stoffen en materialen", "Reacties",
+    "Industrie en analyse", "Rekenen", "Chemie van het leven", "Energie en duurzaamheid"]);
+
+    const test = results[0];
+    const questions = test.questions;
+
+    let domainResults = [0, 0, 0, 0, 0, 0];
+    
+    for (let j = 0; j < questions.length; j++) {
+      domainResults[questions[j].domain]++;
+    }
+
+    setDomainChartData(domainResults);
+  }
 
 
   function onUserFetched(user: User) {
@@ -35,8 +57,10 @@ export default function TestPage() {
       setName(user.email);
       setFullName(user.email);
     }
-
   }
+
+
+
 
     return (
       
@@ -62,6 +86,7 @@ export default function TestPage() {
 
             <div className="bg-white p-7 w-1/3 h-56 m-10 mt-2">
               <p className="text-slate-500">Diagram 1</p>
+
             </div>
           </div>
             
