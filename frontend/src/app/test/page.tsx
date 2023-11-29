@@ -7,19 +7,41 @@ import axios from "axios";
 import User from "@/interfaces/user";
 import { TestResult } from "@/interfaces/testResult";
 import QuestionDomain from "@/enums/Test/questionDomain";
+import { Bar } from "react-chartjs-2";
+import { ChartData,
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend } from "chart.js";
+
+
+
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend
+);
 
 export default function TestPage() {
 
   const [text, setText] = useState("");
   const [name, setName] = useState("");
   const [fullName, setFullName] = useState("");
-  const [domainChartLabels, setDomainChartLabels] = useState([] as string[]);
-  const [domainChartData, setDomainChartData] = useState([] as number[]);
+  const [domainBarChart, setDomainBarChart] = useState<ChartData<"bar"> | null>(null);
+  
 
   useEffect(() => {
     axios.get(`${process.env.NEXT_PUBLIC_API_URL}/testResults`, {withCredentials: true}).then((response) => {
       setText(response.data);
       console.log(response.data);
+      processResults(response.data as TestResult[]);
     }).catch((e) => {
       setText("Error: " + e.data);
       //throw e;
@@ -29,20 +51,51 @@ export default function TestPage() {
 
   function processResults(results: TestResult[]) {
     
-    setDomainChartLabels(["Stoffen en materialen", "Reacties",
-    "Industrie en analyse", "Rekenen", "Chemie van het leven", "Energie en duurzaamheid"]);
+    const domainNames = ["Stoffen en materialen", "Reacties",
+    "Industrie en analyse", "Rekenen", "Chemie van het leven", "Energie en duurzaamheid"];
 
     const test = results[0];
     const questions = test.questions;
 
-    let domainResults = [0, 0, 0, 0, 0, 0];
+    let totalPointsPerDomain = [0, 0, 0, 0, 0, 0];
+    let pointsGainedPerDomain = [0, 0, 0, 0, 0, 0];
     
     for (let j = 0; j < questions.length; j++) {
-      domainResults[questions[j].domain]++;
+      totalPointsPerDomain[questions[j].domain] += questions[j].totalPoints;
+      pointsGainedPerDomain[questions[j].domain] += questions[j].pointsGained;
     }
 
-    setDomainChartData(domainResults);
+    setDomainBarChart({
+      labels: domainNames,
+      datasets: [
+        {
+          label: "Totaal aantal punten",
+          data: totalPointsPerDomain,
+          backgroundColor: [
+            'rgb(153, 102, 255)'
+          ],
+          borderColor: [
+            'rgb(153, 102, 255)'
+          ],
+          borderWidth: 1
+        },
+        {
+          label: "Behaalde punten",
+          data: pointsGainedPerDomain,
+          backgroundColor: [
+            'rgb(255, 99, 132)'
+          ],
+          borderColor: [
+            'rgb(255, 99, 132)'
+          ],
+          borderWidth: 1
+        }
+      ]
+    });
   }
+
+
+
 
 
   function onUserFetched(user: User) {
@@ -86,6 +139,7 @@ export default function TestPage() {
 
             <div className="bg-white p-7 w-1/3 h-56 m-10 mt-2">
               <p className="text-slate-500">Diagram 1</p>
+              {domainBarChart ? <Bar data={domainBarChart} /> : <p>Geen data</p>}
 
             </div>
           </div>
