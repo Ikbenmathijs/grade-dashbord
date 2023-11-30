@@ -126,45 +126,47 @@ export default function TestPage() {
               <p className="text-slate-500">Dashboard van {fullName}</p>
             </div>
           
-            <div className="bg-white rounded-lg p-5 w-1/6 h-16 m-10 mb-6 flex-row-reverse">
+            <div className="bg-white rounded-lg p-5 w-1/6 h-16 m-10 mb-2 flex-row-reverse">
               <p className="text-slate-500 text-right text-lg">Scheikunde</p>
             </div>
           </div>
 
         {/* 2e regel */}
           <div className="flex justify-between">
-            <div className="bg-white rounded-lg p-5 w-1/5 h-24 m-10 mb-2">
-              <p className="text-slate-500">Je hebt nog ... dagen tot de volgende toets.</p>
-            </div>
+            <div className="flex flex-col">
+              <div className="bg-white rounded-lg p-5 w-4/6 h-24 m-5 ml-10">
+                <p className="text-slate-500">Je hebt nog ... dagen tot de volgende toets.</p>
+              </div>
 
-            <div className="bg-white p-7 w-1/3 h-56 m-10 mt-2">
-              <p className="text-slate-500">Diagram 1</p>
-              {domainBarChart ? <Bar data={domainBarChart} /> : <p>Geen data</p>}
+              <div className="bg-white rounded-lg p-5 w-4/6 h-60 m-5 ml-10">
+                <p className="text-slate-500">De volgende hoofdstukken en dimensies:</p>
+              </div>
 
+              <div className="bg-white rounded-lg p-5 h-60 w-full m-5 ml-10">
+                <p className="text-slate-500">Resultaten in percentages</p>
+              </div>
             </div>
+            
+            <div className="flex flex-col">
+              <div className="bg-white p-7 h-56 w-full m-10 mt-0">
+                <p className="text-slate-500">Diagram 1</p>
+                {domainBarChart ? <Bar data={domainBarChart} /> : <p>Geen data</p>}
+
+                <div className="bg-white p-7 h-56 w-full m-10">
+                  <p className="text-slate-500">Diagram 2</p>
+                </div>
+
+                <div className="bg-white p-7 h-56 w-full m-10">
+                  <p className="text-slate-500">Diagram 3</p>
+                </div>
+              </div>
+
           </div>
             
-          {/* 3e regel*/}  
-          <div className="flex justify-between">
-            <div className="bg-white rounded-lg p-5 w-1/5 h-50 m-10 mt-2">
-              <p className="text-slate-500">De volgende hoofdstukken en dimensies:</p>
-            </div>
-
-            <div className="bg-white p-7 w-1/3 h-56 m-10 mt-2">
-              <p className="text-slate-500">Diagram 2</p>
-            </div>
-          </div> 
+          </div>
+            
           
-          {/* 4e regel*/}  
-          <div className="flex justify-between">
-            <div className="bg-white rounded-lg p-5 w-1/2 h-60 m-10 mt-2">
-              <p className="text-slate-500">Resultaten in percentages</p>
-            </div>
-
-            <div className="bg-white p-7 w-1/3 h-56 m-10 mt-2">
-              <p className="text-slate-500">Diagram 3</p>
-            </div>
-          </div> 
+ 
 
       </div>
 
