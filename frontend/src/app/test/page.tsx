@@ -177,23 +177,7 @@ export default function TestPage() {
       </div>
 
         <CheckLogin onSuccess={onUserFetched} />
-        
-        
 
-        
-        <br />
-        <br />
-        <br />
-        <br />
-        <br />
-        <br />
-        <h1>Test page</h1>
-        <p>Only accessable to logged in users!</p>
-
-        <p>{text.toString()}</p>
-        <br />
-        <br />
-        <br />
         <LogoutButton />
       </div>
     )
