@@ -96,7 +96,7 @@ export async function apiLoginUser(req: Request, res: Response, next: NextFuncti
  * @param next Next function
  * @returns 
  */
-export async function apiVerifySession(req: Request, res: Response, next: NextFunction) {
+export async function Session(req: Request, res: Response, next: NextFunction) {
     // get session cookie
     let sessionCookie = req.cookies["Session"];
 
@@ -198,7 +198,8 @@ async function registerUser(google_payload: TokenPayload) {
         email: google_payload.email,
         firstName: google_payload.given_name,
         lastName: google_payload.family_name,
-        createdAt: new Date()
+        createdAt: new Date(),
+        isAdmin: false
     }
 
     const result = await usersDao.createUser(userObj);
