@@ -148,15 +148,21 @@ export default function TestPage() {
             </div>
             
             <div className="flex flex-col">
-              <div className="bg-white p-7 h-56 w-full m-10 mt-0">
-                <p className="text-slate-500">Diagram 1</p>
-                {domainBarChart ? <Bar data={domainBarChart} /> : <p>Geen data</p>}
+              <div className="flex row-reverse">
+                <div className="bg-white p-8 pr-2 h-56 w-96 m-5 mt-0 mr-10">
+                  <p className="text-slate-500">Diagram 1</p>
+                    {domainBarChart ? <Bar data={domainBarChart} /> : <p>Geen data</p>}
+                </div>
+              </div> 
 
-                <div className="bg-white p-7 h-56 w-full m-10">
+              <div className="flex row-reverse">
+                <div className="bg-white p-8 pr-2 h-56 w-96 m-5 mr-10">
                   <p className="text-slate-500">Diagram 2</p>
                 </div>
+              </div>
 
-                <div className="bg-white p-7 h-56 w-full m-10">
+              <div className="flex row-reverse">
+                <div className="bg-white p-8 pr-2 h-56 w-96 m-5 mr-10">
                   <p className="text-slate-500">Diagram 3</p>
                 </div>
               </div>
@@ -175,7 +181,12 @@ export default function TestPage() {
         
 
         
-
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
         <h1>Test page</h1>
         <p>Only accessable to logged in users!</p>
 
