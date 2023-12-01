@@ -35,6 +35,9 @@ export default function TestPage() {
   const [name, setName] = useState("");
   const [fullName, setFullName] = useState("");
   const [domainBarChart, setDomainBarChart] = useState<ChartData<"bar"> | null>(null);
+  const [questionTypeBarChart, setQuestionTypeBarChart] = useState<ChartData<"bar"> | null>(null);
+  const [questionDimensionBarChart, setQuestionDimensionBarChart] = useState<ChartData<"bar"> | null>(null);
+
   
 
   useEffect(() => {
@@ -50,19 +53,32 @@ export default function TestPage() {
 
 
   function processResults(results: TestResult[]) {
-    
     const domainNames = ["Stoffen en materialen", "Reacties",
     "Industrie en analyse", "Rekenen", "Chemie van het leven", "Energie en duurzaamheid"];
+    const questionTypes = ["Formule", "Berekening", "Leg Uit"];
+    const questionDimensions = ["Reproductie", "Toepassing", "Inzicht"];
 
     const test = results[0];
     const questions = test.questions;
 
     let totalPointsPerDomain = [0, 0, 0, 0, 0, 0];
     let pointsGainedPerDomain = [0, 0, 0, 0, 0, 0];
+
+    let totalPointsPerQuestionType = [0, 0, 0];
+    let pointsGainedPerQuestionType = [0, 0, 0];
+
+    let totalPointsPerQuestionDimension = [0, 0, 0];
+    let pointsGainedPerQuestionDimension = [0, 0, 0];
     
     for (let j = 0; j < questions.length; j++) {
       totalPointsPerDomain[questions[j].domain] += questions[j].totalPoints;
       pointsGainedPerDomain[questions[j].domain] += questions[j].pointsGained;
+
+      totalPointsPerQuestionType[questions[j].questionType] += questions[j].totalPoints;
+      pointsGainedPerQuestionType[questions[j].questionType] += questions[j].pointsGained;
+
+      totalPointsPerQuestionDimension[questions[j].dimension] += questions[j].totalPoints;
+      pointsGainedPerQuestionDimension[questions[j].dimension] += questions[j].pointsGained;
     }
 
     setDomainBarChart({
@@ -92,6 +108,67 @@ export default function TestPage() {
         }
       ]
     });
+
+
+    setQuestionTypeBarChart({
+      labels: questionTypes,
+      datasets: [
+        {
+          label: "Totaal aantal punten",
+          data: totalPointsPerQuestionType,
+          backgroundColor: [
+            'rgb(153, 102, 255)'
+          ],
+          borderColor: [
+            'rgb(153, 102, 255)'
+          ],
+          borderWidth: 1
+        },
+        {
+          label: "Behaalde punten",
+          data: pointsGainedPerQuestionType,
+          backgroundColor: [
+            'rgb(255, 99, 132)'
+          ],
+          borderColor: [
+            'rgb(255, 99, 132)'
+          ],
+          borderWidth: 1
+        }
+      ]
+    });
+
+
+    setQuestionDimensionBarChart({
+      labels: questionDimensions,
+      datasets: [
+        {
+          label: "Totaal aantal punten",
+          data: totalPointsPerQuestionDimension,
+          backgroundColor: [
+            'rgb(153, 102, 255)'
+          ],
+          borderColor: [
+            'rgb(153, 102, 255)'
+          ],
+          borderWidth: 1
+        },
+        {
+          label: "Behaalde punten",
+          data: pointsGainedPerQuestionDimension,
+          backgroundColor: [
+            'rgb(255, 99, 132)'
+          ],
+          borderColor: [
+            'rgb(255, 99, 132)'
+          ],
+          borderWidth: 1
+        }
+      ]
+    });
+
+
+
   }
 
 
@@ -152,17 +229,20 @@ export default function TestPage() {
               <div className="justify-items-center">
                 <div className="bg-white p-8 pr-2 h-64 w-96 m-5 mt-0 mr-10">
                   <p className="text-slate-500">Diagram 1</p>
-                    {domainBarChart ? <Bar data={domainBarChart} /> : <p>Geen data</p>}
-                </div> 
-              </div>
-              
-              <div className="flex flex-col">
+                  {domainBarChart ? <Bar data={domainBarChart} /> : <p>Geen data</p>}
+                </div>
+              </div> 
+
+              <div className="flex row-reverse">
                 <div className="bg-white p-8 pr-2 h-56 w-96 m-5 mr-10">
                   <p className="text-slate-500">Diagram 2</p>
+                  {questionTypeBarChart ? <Bar data={questionTypeBarChart} /> : <p>Geen data</p>}
+
                 </div>
 
                 <div className="bg-white p-8 pr-2 h-56 w-96 m-5 mr-10">
                   <p className="text-slate-500">Diagram 3</p>
+                  {questionDimensionBarChart ? <Bar data={questionDimensionBarChart} /> : <p>Geen data</p>}
                 </div>
               </div>
             </div>
