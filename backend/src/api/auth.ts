@@ -96,7 +96,7 @@ export async function apiLoginUser(req: Request, res: Response, next: NextFuncti
  * @param next Next function
  * @returns 
  */
-export async function Session(req: Request, res: Response, next: NextFunction) {
+export async function apiVerifySession(req: Request, res: Response, next: NextFunction) {
     // get session cookie
     let sessionCookie = req.cookies["Session"];
 

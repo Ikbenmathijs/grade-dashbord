@@ -34,7 +34,6 @@ export async function apiGetTestResults(req: Request, res: Response, next: NextF
             continue;
         }
         const test = await TestsDao.getTestById(questionAnswers[i].test);
-        console.log(test)
         if (!test) {
             log(LogLevel.Warning, `Test ${questionAnswers[i].test} from test answer not found`);
             finalQuestionAnswers.filter(questionAnswer => !questionAnswer.test.equals(questionAnswers[i].test));
