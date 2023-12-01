@@ -6,6 +6,7 @@ import QuestionType from "../enums/Test/questionType";
 
 
 export interface TestResult {
+    _id: string;
     name: string;
     totalPoints: number;
     totalQuestions: number;

@@ -2,7 +2,7 @@
 
 import CheckLogin from "@/components/checkLogin"
 import LogoutButton from "@/components/logoutButton"
-import { useEffect, useState } from "react"
+import { ReactElement, useEffect, useState } from "react"
 import axios from "axios";
 import User from "@/interfaces/user";
 import { TestResult } from "@/interfaces/testResult";
@@ -31,34 +31,50 @@ ChartJS.register(
 
 export default function TestPage() {
 
-  const [text, setText] = useState("");
   const [name, setName] = useState("");
   const [fullName, setFullName] = useState("");
   const [domainBarChart, setDomainBarChart] = useState<ChartData<"bar"> | null>(null);
   const [questionTypeBarChart, setQuestionTypeBarChart] = useState<ChartData<"bar"> | null>(null);
   const [questionDimensionBarChart, setQuestionDimensionBarChart] = useState<ChartData<"bar"> | null>(null);
+  const [selectTestOptions, setSelectTestOptions] = useState<ReactElement[] | null>(null);
+  const [testResults, setTestResults] = useState<TestResult[]>([]);
 
   
 
   useEffect(() => {
     axios.get(`${process.env.NEXT_PUBLIC_API_URL}/testResults`, {withCredentials: true}).then((response) => {
-      setText(response.data);
       console.log(response.data);
-      processResults(response.data as TestResult[]);
+
+      
+      let options: ReactElement[] = [];
+      for (let i = 0; i < response.data.length; i++) {
+        const test = response.data[i] as TestResult;
+        options.push(<option value={i} key={test._id}>{test.name}</option>);
+      }
+      setTestResults(response.data as TestResult[]);
+
+      // we pass it here as argument anyways because state is not immediatly updated (only on next render)
+      processResults(0, response.data as TestResult[]);
+
+
+      setSelectTestOptions(options);
+      
+
+      
     }).catch((e) => {
-      setText("Error: " + e.data);
+      console.log(e);
       //throw e;
     });
   }, []);
 
 
-  function processResults(results: TestResult[]) {
+  function processResults(testIndex: number = 0, results: TestResult[] = testResults) {
+    console.log("BAR CHART CHANGE AAA")
     const domainNames = ["Stoffen en materialen", "Reacties",
     "Industrie en analyse", "Rekenen", "Chemie van het leven", "Energie en duurzaamheid"];
     const questionTypes = ["Formule", "Berekening", "Leg Uit"];
     const questionDimensions = ["Reproductie", "Toepassing", "Inzicht"];
-
-    const test = results[0];
+    const test = results[testIndex];
     const questions = test.questions;
 
     let totalPointsPerDomain = [0, 0, 0, 0, 0, 0];
@@ -195,7 +211,13 @@ export default function TestPage() {
     return (
       
       <div>
-        <div className="flex flex-col h-screen">
+        <div className="flex flex-col h-screen text-slate-500">
+          <form>
+            <select onChange={(e) => {console.log("change event owo");
+              processResults(parseInt(e.target.value))}}>
+              {selectTestOptions ? selectTestOptions.map((e) => {return e}) : ""}
+            </select>
+          </form>
         {/* 1e regel */}
           <div className="flex justify-between">
             <div className="bg-white rounded-lg p-7 w-1/4 m-10 mb-2">

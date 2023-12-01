@@ -65,6 +65,11 @@ export async function apiGetTestResults(req: Request, res: Response, next: NextF
     for (let i = 0; i < tests.length; i++) {
         let testResultQuestions: TestResultQuestion[] = [];
         for (let j = 0; j < questions.length; j++) {
+            if (!questions[j].test.equals(tests[i]._id)) {
+                continue;
+            }
+
+
             const questionAnswer = finalQuestionAnswers.find(questionAnswer => questionAnswer.test.equals(questions[j].test) && questionAnswer.questionNumber === questions[j].questionNumber);
             if (!questionAnswer) {
                 res.status(500).json(`Er kon geen antwoord gevonden worden bij vraag ${questions[j].questionNumber} van toets ${tests[i].name} (id: ${tests[i]._id})`);
@@ -81,6 +86,7 @@ export async function apiGetTestResults(req: Request, res: Response, next: NextF
             });
         }
         testResults.push({
+            _id: tests[i]._id.toString(),
             name: tests[i].name,
             totalPoints: tests[i].totalPoints,
             totalQuestions: tests[i].totalQuestions,

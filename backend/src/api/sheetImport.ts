@@ -1,10 +1,13 @@
 import { Request, Response, NextFunction } from "express";
 import { getValidSession } from "./auth";
 import usersDao from "../dao/usersDAO";
+import { importSpreadsheet } from "../sheetImporter/readSheet";
+
 
 
 
 export default async function apiImportSheet(req: Request, res: Response, next: NextFunction) {
+
     const sessionCookie = req.cookies["Session"];
 
     if (!sessionCookie) {
@@ -23,7 +26,26 @@ export default async function apiImportSheet(req: Request, res: Response, next: 
         res.status(500).json({error: "Niet gelukt om gebruiker te vinden"});
         return;
     }
-
     
+    if (!user.isAdmin) {
+        res.status(401).json({error: "Je hebt geen toegang tot deze pagina"});
+        return;
+    }
 
+    const file = req.file;
+
+    if (!file) {
+        res.status(400).json({error: "Er is geen bestand geupload"});
+        return;
+    }
+
+    try {
+        await importSpreadsheet();
+    } catch (e) {
+        res.status(400).json({error: `${e}`});
+        return;
+    }
+
+
+    res.status(200).json({message: "Het bestand is geupload"});
 }

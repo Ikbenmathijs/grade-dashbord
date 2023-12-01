@@ -11,22 +11,32 @@ import TestsDao from "../dao/testsDAO";
 import QuestionsDao from "../dao/questionsDAO";
 import QuestionAnswer from "../interfaces/Test/questionAnswer";
 import QuestionAnswersDao from "../dao/questionAnswersDAO";
+import log from "../logger";
+import LogLevel from "../enums/logLevel";
 
 export async function importSpreadsheet() {
     let {tests, questions, questionAnswers} = await readSheet();
 
+    log(LogLevel.Debug, "Importing spreadsheet");
     for (let i = 0; i < tests.length; i++) {
 
         const oldTest = await TestsDao.getTestByName(tests[i].name);
         // check if test already exists
         if (oldTest) {
-
+            log(LogLevel.Debug, `Test ${tests[i].name} already exists, updating test`);
             // test already exists, update all questions to use the original ID
             for (let j = 0; j < questions.length; j++) {
                 if (questions[j].test == tests[i]._id) {
                     questions[j].test = oldTest._id;
                 }
             }
+            // update all question answers to use the original ID
+            for (let j = 0; j < questionAnswers.length; j++) { 
+                if (questionAnswers[j].test == tests[i]._id) {
+                    questionAnswers[j].test = oldTest._id;
+                }
+            }
+
             // change the test object's ID to the original test's ID
             tests[i]._id = oldTest._id;
             // if something changed, update the test in the database
@@ -94,7 +104,7 @@ export async function importSpreadsheet() {
 
 async function readSheet(): Promise<{tests: Test[], questions: Question[], questionAnswers: QuestionAnswer[]}> {
     const workbook = new Workbook();
-    await workbook.xlsx.readFile("./resources/dummy.xlsx");
+    await workbook.xlsx.readFile("./uploads/importSpreadsheet.xlsx");
     const sheet = workbook.getWorksheet(testDataLayout.sheetName);
 
     let tests: Test[] = [];

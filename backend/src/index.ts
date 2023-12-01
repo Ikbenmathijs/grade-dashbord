@@ -1,8 +1,8 @@
 import express, { Express, Request, Response } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import router from './route';
 import { ServerApiVersion, MongoClient } from 'mongodb';
+import multer from 'multer';
 import log from './logger';
 import LogLevel from './enums/logLevel';
 import UsersDao from './dao/usersDAO';
@@ -11,11 +11,13 @@ import cookieParser from 'cookie-parser';
 import QuestionsDao from './dao/questionsDAO';
 import TestsDao from './dao/testsDAO';
 import QuestionAnswersDao from './dao/questionAnswersDAO';
+import getRouter from './route';
 
 
 /**
  * This file is the entry point of the backend. This is where the server is started.
  */
+
 
 
 // load environment variables
@@ -37,8 +39,19 @@ app.use(express.json());
 // This is needed to be able to read cookies
 app.use(cookieParser());
 
+// This is needed to be able to read the uploaded file
+const storage = multer.diskStorage({ destination: './uploads', filename: (req, file, cb) => {cb(null, "importSpreadsheet.xlsx")} });
+export const upload = multer({ storage: storage });
+
+app.use(express.urlencoded({
+  extended: true
+})); // Add this line to parse form data
+
 // This assigns the routes from route.ts to the /api path
-app.use("/api", router);
+app.use("/api", getRouter());
+
+
+
 
 
 // This creates a MongoDB client instance
