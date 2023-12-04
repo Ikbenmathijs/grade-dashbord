@@ -250,7 +250,7 @@ export default function TestPage() {
             <div className="flex flex-row">
               <div className="justify-items-start">
                 <div className="bg-white p-8 pr-2 h-92 w-128 m-5 mt-8 mx-8">
-                  <p className="text-slate-500 mx-64 my-28">Diagram 1</p>
+                  <p className="text-slate-500 mx-64 my-40">Diagram 1</p>
                   {domainBarChart ? <Bar data={domainBarChart} /> : <p>Geen data</p>}
                 </div>
               </div> 
