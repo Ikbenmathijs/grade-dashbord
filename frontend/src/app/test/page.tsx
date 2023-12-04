@@ -248,21 +248,21 @@ export default function TestPage() {
             
             
             <div className="flex flex-row">
-              <div className="justify-items-start">
-                <div className="bg-white p-8 pr-2 h-92 w-128 m-5 mt-8 mx-8">
-                  <p className="text-slate-500 mx-64 my-40">Diagram 1</p>
+              <div className="justify-items-center">
+                <div className="bg-white p-8 pr-20 h-92 max-w-5xl m-5 mt-4 mx-0">
+                  <p className="text-slate-500 mr-96">Diagram 1</p>
                   {domainBarChart ? <Bar data={domainBarChart} /> : <p>Geen data</p>}
                 </div>
               </div> 
 
               <div className="flex flex-col">
-                <div className="bg-white p-8 pr-2 h-56 w-96 m-5 mr-10">
+                <div className="bg-white p-8 pr-2 h-64 w-96 m-5 mr-10">
                   <p className="text-slate-500">Diagram 2</p>
                   {questionTypeBarChart ? <Bar data={questionTypeBarChart} /> : <p>Geen data</p>}
 
                 </div>
 
-                <div className="bg-white p-8 pr-2 h-56 w-96 m-5 mr-10">
+                <div className="bg-white p-8 pr-2 h-64 w-96 m-5 mr-10">
                   <p className="text-slate-500">Diagram 3</p>
                   {questionDimensionBarChart ? <Bar data={questionDimensionBarChart} /> : <p>Geen data</p>}
                 </div>
