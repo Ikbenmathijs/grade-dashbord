@@ -211,7 +211,7 @@ export default function TestPage() {
     return (
       
       <div>
-        <div className="flex flex-col h-screen text-slate-500">
+        <div className="flex flex-col h-128 bg-slate-200 text-slate-500">
           <form>
             <select onChange={(e) => {console.log("change event owo");
               processResults(parseInt(e.target.value))}}>
@@ -230,55 +230,56 @@ export default function TestPage() {
             </div>
           </div>
 
-        {/* 2e regel */}
-          <div className="flex justify-between">
-            <div className="flex flex-col">
-              <div className="bg-white rounded-lg p-5 w-4/6 h-24 m-5 ml-10 mr-0">
-                <p className="text-slate-500">Je hebt nog ... dagen tot de volgende toets.</p>
+          {/* 2e regel */}
+          <div className="flex flex-col">
+            <div className="relative flex justify-between">
+              <div className="flex flex-col">
+                <div className="bg-white rounded-lg p-5 w-4/6 h-24 m-5 ml-10 mr-0">
+                  <p className="text-slate-500">Je hebt nog ... dagen tot de volgende toets.</p>
+                </div>
+
+                <div className="bg-white rounded-lg p-5 w-4/6 h-60 m-5 ml-10 mr-0">
+                  <p className="text-slate-500">De volgende hoofdstukken en dimensies:</p>
+                </div>
               </div>
 
-              <div className="bg-white rounded-lg p-5 w-4/6 h-60 m-5 ml-10 mr-0">
-                <p className="text-slate-500">De volgende hoofdstukken en dimensies:</p>
-              </div>
+              <div className="flex flex-row">
+                <div className="justify-items-center">
+                  <div className="bg-white p-8 pr-20 h-92 w-256 m-0 mt-12 ml-0 mr-8 my-8">
+                    <p className="text-slate-500 mr-96">Diagram 1</p>
+                    {domainBarChart ? <Bar data={domainBarChart} /> : <p>Geen data</p>}
+                  </div>
+                </div> 
+
+                <div className="flex flex-col">
+                  <div className="bg-white p-8 h-64 w-96 m-5 ml-2 mr-10">
+                    <p className="text-slate-500">Diagram 2</p>
+                    {questionTypeBarChart ? <Bar data={questionTypeBarChart} /> : <p>Geen data</p>}
+
+                  </div>
+
+                  <div className="bg-white p-8 h-64 w-96 m-5 ml-2 mr-10">
+                    <p className="text-slate-500">Diagram 3</p>
+                    {questionDimensionBarChart ? <Bar data={questionDimensionBarChart} /> : <p>Geen data</p>}
+                  </div>
+                </div>
+              </div>           
             </div>
 
-            <div className="flex flex-row">
-              <div className="justify-items-center">
-                <div className="bg-white p-8 pr-20 h-92 w-256 m-0 mt-12 ml-0 mr-8 my-8">
-                  <p className="text-slate-500 mr-96">Diagram 1</p>
-                  {domainBarChart ? <Bar data={domainBarChart} /> : <p>Geen data</p>}
-                </div>
-              </div> 
-
-              <div className="flex flex-col">
-                <div className="bg-white p-8 h-64 w-96 m-5 ml-2 mr-10">
-                  <p className="text-slate-500">Diagram 2</p>
-                  {questionTypeBarChart ? <Bar data={questionTypeBarChart} /> : <p>Geen data</p>}
-
-                </div>
-
-                <div className="bg-white p-8 h-64 w-96 m-5 ml-2 mr-10">
-                  <p className="text-slate-500">Diagram 3</p>
-                  {questionDimensionBarChart ? <Bar data={questionDimensionBarChart} /> : <p>Geen data</p>}
-                </div>
-              </div>
-            </div>           
-          </div>
-
-          <div className="flex justify-start items-end">
-              <div className="bg-white rounded-lg p-5 h-60 w-2/5 m-5 ml-10 ">
+            <div className="absolute bottom-[-50px] w-[1500px] flex justify-start items-end">
+              <div className="bg-white rounded-lg p-5 h-30 w-2/5 m-5 ml-10 ">
                 <p className="text-slate-500">Resultaten in percentages</p>
               </div>
             </div>
-           
+          </div>
           
  
-
-      </div>
 
         <CheckLogin onSuccess={onUserFetched} />
 
         <LogoutButton />
+
+        </div>
       </div>
     )
   }
