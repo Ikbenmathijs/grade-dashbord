@@ -3,6 +3,7 @@ import { useState } from "react";
 import axios from "axios";
 import ErrorMessage from "@/components/errorMessage";
 import SuccessMessage from "@/components/successMessage";
+import LoadingIcon from "@/components/loadingIcon";
 
 export default function uploadPage() {
 
@@ -13,6 +14,7 @@ export default function uploadPage() {
     const [successMessageDesc, setSuccessMessageDesc] = useState("");
     const [successMessageTitle, setSuccessMessageTitle] = useState("");
     const [successMessageHidden, setSuccessMessageHidden] = useState(true);
+    const [loading, setLoading] = useState(false);
 
 
     async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -24,7 +26,7 @@ export default function uploadPage() {
         let data = new FormData();
         data.append("sheet", selectedFile);
 
-
+        setLoading(true);
         axios.post(`${process.env.NEXT_PUBLIC_API_URL}/sheets/import`, data, {
             withCredentials: true, 
             headers: {
@@ -34,6 +36,7 @@ export default function uploadPage() {
             setSuccessMessageTitle("Success!");
             setSuccessMessageDesc("De gegevens zijn succesvol geïmporteerd vanuit de spreadsheet!");
             setSuccessMessageHidden(false);
+            setLoading(false);
         }).catch((e) => {
             console.log(e.data);
             setErrorMessageTitle("Er is iets mis gegaan!");
@@ -43,6 +46,7 @@ export default function uploadPage() {
                 setErrorMessageDesc("Er is een fout opgetreden bij het importeren van de gegevens vanuit de spreadsheet!");
             }
             setErrorMessageHidden(false);
+            setLoading(false);
         });
     }
 
@@ -52,10 +56,13 @@ export default function uploadPage() {
         <div className="relative w-full h-full">
             <div className="relative bg-white rounded-lg shadow-2xl shadow-slate-700 backdrop-grayscale">
                 <div className="p-6 text-center">
-                <form onSubmit={onSubmit}>
-                    <input className="text-slate-700" type="file" name="file" accept=".xlsx" onChange={(e) => {setSelectedFile(e.target.files?.[0])}} />
-                    <input className="text-slate-700" type="submit" value="Upload"/>
+                <form onSubmit={onSubmit} className="flex justify-center flex-col items-center">
+                    <input className="text-slate-700 mb-10" type="file" name="file" accept=".xlsx" onChange={(e) => {setSelectedFile(e.target.files?.[0])}} />
+                    <br />
+                    <input className="text-slate-700 bg-green-400 py-3 px-9 rounded-3xl" type="submit" value="Upload"/>
                 </form>
+                <LoadingIcon hidden={!loading} />
+
                 </div>
             </div>
         </div>
