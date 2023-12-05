@@ -41,7 +41,7 @@ export default function LogoutButton() {
 
     return (
         <div>
-            <button onClick={logout}>Logout</button>
+            <button className="bg-white rounded-lg w-20 m-10" onClick={logout}>Logout</button>
             <ErrorMessage hidden={errorHidden} setHiddenCallback={errorOkButtonClicked} title="Uitloggen mislukt!" desc={errorMessage} />
         </div>
     )

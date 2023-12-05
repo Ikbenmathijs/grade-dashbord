@@ -212,12 +212,6 @@ export default function TestPage() {
       
       <div>
         <div className="flex flex-col h-128 bg-slate-200 text-slate-500">
-          <form>
-            <select onChange={(e) => {console.log("change event owo");
-              processResults(parseInt(e.target.value))}}>
-              {selectTestOptions ? selectTestOptions.map((e) => {return e}) : ""}
-            </select>
-          </form>
         {/* 1e regel */}
           <div className="flex justify-between">
             <div className="bg-white rounded-lg p-7 w-1/4 m-10 mb-2">
@@ -230,26 +224,52 @@ export default function TestPage() {
             </div>
           </div>
 
-          {/* 2e regel */}
+          {/* 2e regel */}          
           <div className="flex flex-col">
-            <div className="relative flex justify-between">
+            <div className="flex justify-between">
               <div className="flex flex-col">
+                <div className="bg-white rounded-lg w-4/6 h-32 ml-10 p-5 m-5">
+                  <p>Kies hier de toets die je wilt bekijken:</p>
+                  <br />
+                  <form>
+                    <select onChange={(e) => {console.log("change event owo");
+                      processResults(parseInt(e.target.value))}}>
+                      {selectTestOptions ? selectTestOptions.map((e) => {return e}) : ""}
+                    </select>
+                  </form>
+                </div>
                 <div className="bg-white rounded-lg p-5 w-4/6 h-24 m-5 ml-10 mr-0">
                   <p className="text-slate-500">Je hebt nog ... dagen tot de volgende toets.</p>
                 </div>
 
-                <div className="bg-white rounded-lg p-5 w-4/6 h-60 m-5 ml-10 mr-0">
-                  <p className="text-slate-500">De volgende hoofdstukken en dimensies:</p>
+                <div className="bg-white rounded-lg p-5 w-4/6 h-72 m-5 ml-10 mr-0">
+                  <p className="text-slate-500">
+                    <b>De volgende hoofdstukken en dimensies:</b>
+                    <br /> 
+                    <i>Bijvoorbeeld</i>
+                  <br />
+                  - Hoofdstuk 8
+                  <br />
+                  - Hoofdstuk 9
+                  <br />
+                  - Hoofdstuk 10
+                  </p>
                 </div>
               </div>
 
               <div className="flex flex-row">
-                <div className="justify-items-center">
-                  <div className="bg-white p-8 pr-20 h-92 w-256 m-0 mt-12 ml-0 mr-8 my-8">
-                    <p className="text-slate-500 mr-96">Diagram 1</p>
-                    {domainBarChart ? <Bar data={domainBarChart} /> : <p>Geen data</p>}
-                  </div>
-                </div> 
+                <div className="flex flex-col justify-items-start">
+                    <div className="bg-white p-12 h-92 w-256 m-0 ml-0 mr-16 my-5">
+                      <p className="text-slate-500 mr-96">Diagram 1</p>
+                      {domainBarChart ? <Bar data={domainBarChart} /> : <p>Geen data</p>}
+                    </div>
+
+                    <div className="flex justify-start items-end">
+                      <div className="bg-white rounded-lg p-5 h-64 w-full m-5 ml-0 mr-16">
+                        <p className="text-slate-500">Resultaten in percentages</p>
+                      </div>
+                    </div> 
+                </div>
 
                 <div className="flex flex-col">
                   <div className="bg-white p-8 h-64 w-96 m-5 ml-2 mr-10">
@@ -265,19 +285,16 @@ export default function TestPage() {
                 </div>
               </div>           
             </div>
-
-            <div className="absolute bottom-[-50px] w-[1500px] flex justify-start items-end">
-              <div className="bg-white rounded-lg p-5 h-30 w-2/5 m-5 ml-10 ">
-                <p className="text-slate-500">Resultaten in percentages</p>
-              </div>
-            </div>
           </div>
           
  
 
         <CheckLogin onSuccess={onUserFetched} />
 
-        <LogoutButton />
+        <div>
+          <LogoutButton />
+        </div>
+        
 
         </div>
       </div>
