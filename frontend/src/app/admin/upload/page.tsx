@@ -48,12 +48,19 @@ export default function uploadPage() {
 
 
     return (<>
-        <form onSubmit={onSubmit}>
-            <input type="file" name="file" accept=".xlsx" onChange={(e) => {setSelectedFile(e.target.files?.[0])}} />
-            <br />
-            <br />
-            <input type="submit" value="Upload"/>
-        </form>
+    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 p-4">
+        <div className="relative w-full h-full">
+            <div className="relative bg-white rounded-lg shadow-2xl shadow-slate-700 backdrop-grayscale">
+                <div className="p-6 text-center">
+                <form onSubmit={onSubmit}>
+                    <input className="text-slate-700" type="file" name="file" accept=".xlsx" onChange={(e) => {setSelectedFile(e.target.files?.[0])}} />
+                    <input className="text-slate-700" type="submit" value="Upload"/>
+                </form>
+                </div>
+            </div>
+        </div>
+    </div>
+        
 
         <ErrorMessage title={errorMessageTitle} desc={errorMessageDesc} hidden={errorMessageHidden} setHiddenCallback={setErrorMessageHidden} />
         <SuccessMessage title={successMessageTitle} desc={successMessageDesc} hidden={successMessageHidden} setHiddenCallback={setSuccessMessageHidden} />
