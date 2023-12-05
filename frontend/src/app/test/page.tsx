@@ -213,7 +213,7 @@ export default function TestPage() {
       <div>
         <div className="flex flex-col h-128 bg-slate-200 text-slate-500">
           <form>
-            <select onChange={(e) => {console.log("change event owo");
+            <select onChange={(e) => {
               processResults(parseInt(e.target.value))}}>
               {selectTestOptions ? selectTestOptions.map((e) => {return e}) : ""}
             </select>
