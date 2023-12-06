@@ -282,8 +282,9 @@ export default function TestPage() {
           <div className="flex flex-col">
             <div className="flex justify-between">
               <div className="flex flex-col">
-                <div className="bg-white rounded-lg w-4/6 h-32 ml-10 p-5 m-5">
+                <div className="bg-white rounded-lg w-4/6 h-40 ml-10 p-5 m-5">
                   <p>Kies hier de toets die je wilt bekijken:</p>
+                  <br />
                   {/* Toets selectie menu */}
                   <form>
                     <select onChange={e => processResults(parseInt(e.target.value))}>
@@ -320,7 +321,7 @@ export default function TestPage() {
 
               <div className="flex flex-row">
                 <div className="flex flex-col justify-items-start">
-                    <div className="bg-white p-12 h-92 w-256 m-0 ml-0 mr-16 my-5">
+                    <div className="bg-white p-8 h-92 w-256 m-0 ml-0 mr-16 my-4">
                       <p className="text-slate-500 mr-96">Diagram 1</p>
                       {domainBarChart ? <Bar data={domainBarChart} /> : <p>Geen data</p>}
                     </div>
