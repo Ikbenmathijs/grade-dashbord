@@ -1,11 +1,9 @@
 'use client'
 
-export default function LoadingIcon({hidden}: {hidden: boolean | undefined}) {
-    console.log(hidden);
+export default function LoadingIcon() {
     return (<>
-    <div className="flex justify-center" hidden={hidden} >
+    <div className="flex justify-center" >
         <img className={"animate-spin"} height={50} width={50} src="/icons/loading.svg" />  
-        <p>{hidden}</p>
     </div>
     
     </>)

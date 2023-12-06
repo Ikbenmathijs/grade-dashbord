@@ -59,9 +59,12 @@ export default function uploadPage() {
                 <form onSubmit={onSubmit} className="flex justify-center flex-col items-center">
                     <input className="text-slate-700 mb-10" type="file" name="file" accept=".xlsx" onChange={(e) => {setSelectedFile(e.target.files?.[0])}} />
                     <br />
-                    <input className="text-slate-700 bg-green-400 py-3 px-9 rounded-3xl" type="submit" value="Upload"/>
+                    
+                    <input hidden={loading} className="text-slate-700 bg-green-400 py-3 px-9 rounded-3xl" type="submit" value="Upload"/>
                 </form>
-                <LoadingIcon hidden={!loading} />
+                <div hidden={!loading}>
+                    <LoadingIcon />
+                </div>
 
                 </div>
             </div>
