@@ -77,91 +77,122 @@ export default function TestPage() {
     "Industrie en analyse", "Rekenen", "Chemie van het leven", "Energie en duurzaamheid"];
     const questionTypes = ["Formule", "Berekening", "Leg Uit"];
     const questionDimensions = ["Reproductie", "Toepassing", "Inzicht"];
-    const test = results[testIndex];
-    const questions = test.questions;
 
-    let totalPointsPerDomain = [0, 0, 0, 0, 0, 0];
-    let pointsGainedPerDomain = [0, 0, 0, 0, 0, 0];
-    let percentagesPerDomain = [0, 0, 0, 0, 0, 0];
+    let tests: TestResult[];
+    if (testIndex == -1) {
+      tests = results;
+    } else {
+      tests = [results[testIndex]];
+    }
 
-    let totalPointsPerQuestionType = [0, 0, 0];
-    let pointsGainedPerQuestionType = [0, 0, 0];
-    let percentagesPerQuestionType = [0, 0, 0];
+    let totalPointsPerDomain = [] as number[][];
+    let pointsGainedPerDomain = [] as number[][];
+    let percentagesPerDomain = [] as number[][];
 
-    let totalPointsPerQuestionDimension = [0, 0, 0];
-    let pointsGainedPerQuestionDimension = [0, 0, 0];
-    let percentagesPerQuestionDimension = [0, 0, 0];
+    let totalPointsPerQuestionType = [] as number[][];
+    let pointsGainedPerQuestionType = [] as number[][];
+    let percentagesPerQuestionType = [] as number[][];
 
-
+    let totalPointsPerQuestionDimension = [] as number[][];
+    let pointsGainedPerQuestionDimension = [] as number[][];
+    let percentagesPerQuestionDimension = [] as number[][];
     
-    for (let j = 0; j < questions.length; j++) {
-      totalPointsPerDomain[questions[j].domain] += questions[j].totalPoints;
-      pointsGainedPerDomain[questions[j].domain] += questions[j].pointsGained;
-      percentagesPerDomain[questions[j].domain] = pointsGainedPerDomain[questions[j].domain] / totalPointsPerDomain[questions[j].domain] * 100;
 
-      totalPointsPerQuestionType[questions[j].questionType] += questions[j].totalPoints;
-      pointsGainedPerQuestionType[questions[j].questionType] += questions[j].pointsGained;
-      percentagesPerQuestionType[questions[j].questionType] = pointsGainedPerQuestionType[questions[j].questionType] / totalPointsPerQuestionType[questions[j].questionType] * 100;
+    for (let i = 0; i < tests.length; i++) {
 
-      totalPointsPerQuestionDimension[questions[j].dimension] += questions[j].totalPoints;
-      pointsGainedPerQuestionDimension[questions[j].dimension] += questions[j].pointsGained;
-      percentagesPerQuestionDimension[questions[j].dimension] = pointsGainedPerQuestionDimension[questions[j].dimension] / totalPointsPerQuestionDimension[questions[j].dimension] * 100;
+      totalPointsPerDomain[i] = [0, 0, 0, 0, 0, 0];
+      pointsGainedPerDomain[i] = [0, 0, 0, 0, 0, 0];
+      percentagesPerDomain[i] = [0, 0, 0, 0, 0, 0];
+
+      totalPointsPerQuestionType[i] = [0, 0, 0];
+      pointsGainedPerQuestionType[i] = [0, 0, 0];
+      percentagesPerQuestionType[i] = [0, 0, 0];
+
+      totalPointsPerQuestionDimension[i] = [0, 0, 0];
+      pointsGainedPerQuestionDimension[i] = [0, 0, 0];
+      percentagesPerQuestionDimension[i] = [0, 0, 0];
+
+      const questions = tests[i].questions;
+
+      for (let j = 0; j < questions.length; j++) {
+        totalPointsPerDomain[i][questions[j].domain] += questions[j].totalPoints;
+        pointsGainedPerDomain[i][questions[j].domain] += questions[j].pointsGained;
+        percentagesPerDomain[i][questions[j].domain] = pointsGainedPerDomain[i][questions[j].domain] / totalPointsPerDomain[i][questions[j].domain] * 100;
+  
+        totalPointsPerQuestionType[i][questions[j].questionType] += questions[j].totalPoints;
+        pointsGainedPerQuestionType[i][questions[j].questionType] += questions[j].pointsGained;
+        percentagesPerQuestionType[i][questions[j].questionType] = pointsGainedPerQuestionType[i][questions[j].questionType] / totalPointsPerQuestionType[i][questions[j].questionType] * 100;
+  
+        totalPointsPerQuestionDimension[i][questions[j].dimension] += questions[j].totalPoints;
+        pointsGainedPerQuestionDimension[i][questions[j].dimension] += questions[j].pointsGained;
+        percentagesPerQuestionDimension[i][questions[j].dimension] = pointsGainedPerQuestionDimension[i][questions[j].dimension] / totalPointsPerQuestionDimension[i][questions[j].dimension] * 100;
+      }
+    }
+    
+    
+    let domainPercentagesDatassets = [];
+    let domainTotalPointsDatasets = [];
+
+
+    for (let i = 0; i < tests.length; i++) {
+      domainTotalPointsDatasets.push(...[
+        {
+          label: `Totaal aantal punten voor ${tests[i].name}`,
+          data: totalPointsPerDomain[i],
+          backgroundColor: [
+            'rgb(153, 102, 255)'
+          ],
+          borderColor: [
+            'rgb(153, 102, 255)'
+          ],
+          borderWidth: 1
+        },
+        {
+          label: `Behaalde punten voor ${tests[i].name}`,
+          data: pointsGainedPerDomain[i],
+          backgroundColor: [
+            'rgb(255, 99, 132)'
+          ],
+          borderColor: [
+            'rgb(255, 99, 132)'
+          ],
+          borderWidth: 1
+        }
+      ]);
+
+      domainPercentagesDatassets.push({
+        label: `% Behaalde punten voor ${tests[i].name}`,
+        data: percentagesPerDomain[i],
+        backgroundColor: [
+          'rgb(153, 102, 255)'
+        ],
+        borderColor: [
+          'rgb(153, 102, 255)'
+        ],
+
+      })
     }
 
 
 
     let domainBarChartData = {
       labels: domainNames,
-      datasets: !usePercentages ? [
-        {
-          label: "Totaal aantal punten",
-          data: totalPointsPerDomain,
-          backgroundColor: [
-            'rgb(153, 102, 255)'
-          ],
-          borderColor: [
-            'rgb(153, 102, 255)'
-          ],
-          borderWidth: 1
-        },
-        {
-          label: "Behaalde punten",
-          data: pointsGainedPerDomain,
-          backgroundColor: [
-            'rgb(255, 99, 132)'
-          ],
-          borderColor: [
-            'rgb(255, 99, 132)'
-          ],
-          borderWidth: 1
-        }
-      ] : [
-        {
-          label: "Percentage behaalde punten",
-          data: percentagesPerDomain,
-          backgroundColor: [
-            'rgb(153, 102, 255)'
-          ],
-          borderColor: [
-            'rgb(153, 102, 255)'
-          ],
-
-        }
-      ]
+      datasets: !usePercentages ? domainTotalPointsDatasets : domainPercentagesDatassets
     };
 
 
     setDomainBarChart(domainBarChartData);
 
     
+    let questionTotalPointsDatasets = [];
+    let questionPercentagesDatasets = [];
 
 
-    let questionTypeBarChartData ={
-      labels: questionTypes,
-      datasets: !usePercentages ? [
+    for (let i = 0; i < tests.length; i++) {
+      questionTotalPointsDatasets.push(...[
         {
-          label: "Totaal aantal punten",
-          data: totalPointsPerQuestionType,
+          label: `Totaal aantal punten voor ${tests[i].name}`,
+          data: totalPointsPerQuestionType[i],
           backgroundColor: [
             'rgb(153, 102, 255)'
           ],
@@ -171,8 +202,8 @@ export default function TestPage() {
           borderWidth: 1
         },
         {
-          label: "Behaalde punten",
-          data: pointsGainedPerQuestionType,
+          label: `Behaalde punten voor ${tests[i].name}`,
+          data: pointsGainedPerQuestionType[i],
           backgroundColor: [
             'rgb(255, 99, 132)'
           ],
@@ -181,29 +212,39 @@ export default function TestPage() {
           ],
           borderWidth: 1
         }
-      ] : [
-        {
-          label: "Percentage behaalde punten",
-          data: percentagesPerQuestionType,
-          backgroundColor: [
-            'rgb(153, 102, 255)'
-          ],
-          borderColor: [
-            'rgb(153, 102, 255)'
-          ],
-        }
-      ]
+      ]);
+
+      questionPercentagesDatasets.push({
+        label: `% Behaalde punten voor ${tests[i].name}`,
+        data: percentagesPerQuestionType[i],
+        backgroundColor: [
+          'rgb(153, 102, 255)'
+        ],
+        borderColor: [
+          'rgb(153, 102, 255)'
+        ],
+
+      })
+    }
+
+    let questionTypeBarChartData ={
+      labels: questionTypes,
+      datasets: !usePercentages ? questionTotalPointsDatasets : questionPercentagesDatasets
     }
 
 
     setQuestionTypeBarChart(questionTypeBarChartData);
 
-    let questionDimensionBarChartData = {
-      labels: questionDimensions,
-      datasets: !usePercentages ? [
+
+    let questionDimensionTotalPointsDatasets = [];
+    let questionDimensionPercentagesDatasets = [];
+
+
+    for (let i = 0; i < tests.length; i++) {
+      questionDimensionTotalPointsDatasets.push(...[
         {
-          label: "Totaal aantal punten",
-          data: totalPointsPerQuestionDimension,
+          label: `Totaal aantal punten voor ${tests[i].name}`,
+          data: totalPointsPerQuestionDimension[i],
           backgroundColor: [
             'rgb(153, 102, 255)'
           ],
@@ -213,8 +254,8 @@ export default function TestPage() {
           borderWidth: 1
         },
         {
-          label: "Behaalde punten",
-          data: pointsGainedPerQuestionDimension,
+          label: `Behaalde punten voor ${tests[i].name}`,
+          data: pointsGainedPerQuestionDimension[i],
           backgroundColor: [
             'rgb(255, 99, 132)'
           ],
@@ -223,22 +264,29 @@ export default function TestPage() {
           ],
           borderWidth: 1
         }
-      ] : [
-        {
-          label: "Percentage behaalde punten",
-          data: percentagesPerQuestionDimension,
-          backgroundColor: [
-            'rgb(153, 102, 255)'
-          ],
-          borderColor: [
-            'rgb(153, 102, 255)'
-          ],
-        }
-      ]
+      ]);
+
+      questionDimensionPercentagesDatasets.push({
+        label: `% Behaalde punten voor ${tests[i].name}`,
+        data: percentagesPerQuestionDimension[i],
+        backgroundColor: [
+          'rgb(153, 102, 255)'
+        ],
+        borderColor: [
+          'rgb(153, 102, 255)'
+        ],
+
+      })
     }
 
 
-    setQuestionDimensionBarChart(questionDimensionBarChartData) ;
+    let questionDimensionBarChartData = {
+      labels: questionDimensions,
+      datasets: !usePercentages ? questionDimensionTotalPointsDatasets : questionDimensionPercentagesDatasets
+    }
+
+
+    setQuestionDimensionBarChart(questionDimensionBarChartData);
   }
 
 
@@ -288,6 +336,7 @@ export default function TestPage() {
                   {/* Toets selectie menu */}
                   <form>
                     <select onChange={e => processResults(parseInt(e.target.value))}>
+                      <option value="-1" key="1">Alle toetsen</option>
                       {selectTestOptions ? selectTestOptions.map((e) => {return e}) : ""}
                     </select>
                   </form>
