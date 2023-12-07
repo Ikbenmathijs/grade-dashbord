@@ -2,12 +2,12 @@
 
 import CheckLogin from "@/components/checkLogin"
 import LogoutButton from "@/components/logoutButton"
-import { ReactElement, useEffect, useState } from "react"
+import { ReactElement, useEffect, useState, useRef, MutableRefObject } from "react"
 import axios from "axios";
 import User from "@/interfaces/user";
 import { TestResult } from "@/interfaces/testResult";
 import QuestionDomain from "@/enums/Test/questionDomain";
-import { Bar } from "react-chartjs-2";
+import { Bar, getDatasetAtEvent } from "react-chartjs-2";
 import { ChartData,
   Chart as ChartJS,
   CategoryScale,
@@ -16,7 +16,6 @@ import { ChartData,
   Title,
   Tooltip,
   Legend } from "chart.js";
-
 
 
 
@@ -30,6 +29,11 @@ ChartJS.register(
 );
 
 export default function TestPage() {
+  const colorOrder = ["#ff6687", "#ffce5d", "#4ed9d9", "#37afff"]
+
+
+  const percentageModeOptionsDefault = [<option value="false" key="1">Punten</option>, <option value="true" key="2">Percentages</option>];
+
 
   const [name, setName] = useState("");
   const [fullName, setFullName] = useState("");
@@ -40,30 +44,32 @@ export default function TestPage() {
   const [testResults, setTestResults] = useState<TestResult[]>([]);
   const [percentageMode, setPercentageMode] = useState<boolean>(false);
   const [selectedTestIndex, setSelectedTestIndex] = useState<number>(0);
+  const [percentageModeOptions, setPercentageModeOptions] = useState<ReactElement[]>(percentageModeOptionsDefault);
+
+  const chartRefs: {[key: string]: MutableRefObject<ChartJS<"bar"> | null>} = {
+    domain: useRef<ChartJS<"bar"> | null>(null),
+    questionType: useRef<ChartJS<"bar"> | null>(null),
+    dimension: useRef<ChartJS<"bar"> | null>(null)
+  }
 
 
   
 
+
   useEffect(() => {
     axios.get(`${process.env.NEXT_PUBLIC_API_URL}/testResults`, {withCredentials: true}).then((response) => {
       console.log(response.data);
-
       
-      let options: ReactElement[] = [];
       for (let i = 0; i < response.data.length; i++) {
         const test = response.data[i] as TestResult;
-        options.push(<option value={i} key={test._id}>{test.name}</option>);
       }
       setTestResults(response.data as TestResult[]);
 
+      generateTestOptions(response.data as TestResult[]);
+
       // we pass it here as argument anyways because state is not immediatly updated (only on next render)
-      processResults(0, response.data as TestResult[]);
+      processResults(-1, response.data as TestResult[]);
 
-
-      setSelectTestOptions(options);
-      
-
-      
     }).catch((e) => {
       console.log(e.data);
       //throw e;
@@ -71,8 +77,22 @@ export default function TestPage() {
   }, []);
 
 
-  function processResults(testIndex: number = selectedTestIndex, results: TestResult[] = testResults, usePercentages: boolean = percentageMode) {
+  function generateTestOptions(results: TestResult[], selectedIndex: number =-1) {
+    let options: ReactElement[] = [];
+    options.push(<option value="-1" key="1" selected={selectedIndex === -1}>Alle toetsen</option>);
+    for (let i = 0; i < results.length; i++) {
+      const test = results[i];
+      options.push(<option value={i} key={test._id} selected={selectedIndex == i}>{test.name}</option>);
+    }
+    setSelectTestOptions(options);
+  }
+
+
+  function processResults(testIndex: number = selectedTestIndex, results: TestResult[] = testResults, usePercentages: boolean = percentageMode, color?: string) {
     setSelectedTestIndex(testIndex);
+
+    
+
     const domainNames = ["Stoffen en materialen", "Reacties",
     "Industrie en analyse", "Rekenen", "Chemie van het leven", "Energie en duurzaamheid"];
     const questionTypes = ["Formule", "Berekening", "Leg Uit"];
@@ -81,9 +101,17 @@ export default function TestPage() {
     let tests: TestResult[];
     if (testIndex == -1) {
       tests = results;
+
+      setPercentageModeOptions([percentageModeOptionsDefault[1]]);
+      usePercentages = true;
+      setPercentageMode(true);
     } else {
       tests = [results[testIndex]];
+      setPercentageModeOptions(percentageModeOptionsDefault);
     }
+
+    generateTestOptions(results, testIndex);
+
 
     let totalPointsPerDomain = [] as number[][];
     let pointsGainedPerDomain = [] as number[][];
@@ -142,21 +170,13 @@ export default function TestPage() {
           backgroundColor: [
             'rgb(153, 102, 255)'
           ],
-          borderColor: [
-            'rgb(153, 102, 255)'
-          ],
-          borderWidth: 1
         },
         {
           label: `Behaalde punten voor ${tests[i].name}`,
           data: pointsGainedPerDomain[i],
           backgroundColor: [
-            'rgb(255, 99, 132)'
-          ],
-          borderColor: [
-            'rgb(255, 99, 132)'
-          ],
-          borderWidth: 1
+              color ? color : colorOrder[testIndex % colorOrder.length]
+          ]
         }
       ]);
 
@@ -164,10 +184,7 @@ export default function TestPage() {
         label: `% Behaalde punten voor ${tests[i].name}`,
         data: percentagesPerDomain[i],
         backgroundColor: [
-          'rgb(153, 102, 255)'
-        ],
-        borderColor: [
-          'rgb(153, 102, 255)'
+          color ? color : colorOrder[(testIndex == -1 ? i : testIndex) % colorOrder.length]
         ],
 
       })
@@ -205,12 +222,8 @@ export default function TestPage() {
           label: `Behaalde punten voor ${tests[i].name}`,
           data: pointsGainedPerQuestionType[i],
           backgroundColor: [
-            'rgb(255, 99, 132)'
-          ],
-          borderColor: [
-            'rgb(255, 99, 132)'
-          ],
-          borderWidth: 1
+            color ? color : colorOrder[testIndex % colorOrder.length]
+          ]
         }
       ]);
 
@@ -218,10 +231,7 @@ export default function TestPage() {
         label: `% Behaalde punten voor ${tests[i].name}`,
         data: percentagesPerQuestionType[i],
         backgroundColor: [
-          'rgb(153, 102, 255)'
-        ],
-        borderColor: [
-          'rgb(153, 102, 255)'
+          color ? color : colorOrder[(testIndex == -1 ? i : testIndex) % colorOrder.length]
         ],
 
       })
@@ -257,12 +267,8 @@ export default function TestPage() {
           label: `Behaalde punten voor ${tests[i].name}`,
           data: pointsGainedPerQuestionDimension[i],
           backgroundColor: [
-            'rgb(255, 99, 132)'
-          ],
-          borderColor: [
-            'rgb(255, 99, 132)'
-          ],
-          borderWidth: 1
+              color ? color : colorOrder[testIndex % colorOrder.length]
+          ]
         }
       ]);
 
@@ -270,10 +276,7 @@ export default function TestPage() {
         label: `% Behaalde punten voor ${tests[i].name}`,
         data: percentagesPerQuestionDimension[i],
         backgroundColor: [
-          'rgb(153, 102, 255)'
-        ],
-        borderColor: [
-          'rgb(153, 102, 255)'
+          color ? color : colorOrder[(testIndex == -1 ? i : testIndex) % colorOrder.length]
         ],
 
       })
@@ -290,9 +293,6 @@ export default function TestPage() {
   }
 
 
-
-
-
   function onUserFetched(user: User) {
     if (user.firstName) {
       setName(user.firstName);
@@ -304,6 +304,53 @@ export default function TestPage() {
     } else {
       setName(user.email);
       setFullName(user.email);
+    }
+  }
+
+
+
+  function domainChartClicked(e: any) {
+    barChartClicked(e, "domain");
+  }
+
+  function questionTypeChartClicked(e: any) {
+    barChartClicked(e, "questionType");
+  }
+
+  function dimensionChartClicked(e: any) {
+    barChartClicked(e, "dimension");
+  }
+
+
+  function barChartClicked(e: any, refKey: string) {
+    const chart = chartRefs[refKey].current;
+
+
+    if (chart) {
+      const bars = chart.getElementsAtEventForMode(e, "nearest", {intersect: true}, true);
+      if (bars.length == 0) {
+        return;
+      }
+      const bar = bars[0];
+      const label = chart.data.datasets[bar.datasetIndex].label;
+      if (label) {
+        for (let i = 0; i < testResults.length; i++) {
+          if (label.includes(testResults[i].name)) {
+            const color = chart.data.datasets[bar.datasetIndex].backgroundColor;
+            if (selectedTestIndex == -1) {
+              // this is so cursed but typescript wants me to
+              if (color && typeof (color as any)[0] === "string") { 
+                processResults(i, testResults, percentageMode, (color as any)[0]);
+              } else {
+                processResults(i, testResults, percentageMode);
+              }
+            } else {
+              processResults(-1, testResults, percentageMode);
+              
+            }
+          }
+        }
+      }
     }
   }
 
@@ -336,7 +383,7 @@ export default function TestPage() {
                   {/* Toets selectie menu */}
                   <form>
                     <select onChange={e => processResults(parseInt(e.target.value))}>
-                      <option value="-1" key="1">Alle toetsen</option>
+                      
                       {selectTestOptions ? selectTestOptions.map((e) => {return e}) : ""}
                     </select>
                   </form>
@@ -344,8 +391,7 @@ export default function TestPage() {
                   {/* Punten of percentages selectie menu */}
                   <form>
                     <select onChange={e => {setPercentageMode(e.target.value === "true"); processResults(undefined, undefined, e.target.value === "true")}}>
-                      <option value="false" key="1">Punten</option>
-                      <option value="true" key="2">Percentages</option>
+                      {percentageModeOptions.map((e) => {return e})}
                     </select>
                   </form>
                 </div>
@@ -372,7 +418,7 @@ export default function TestPage() {
                 <div className="flex flex-col justify-items-start">
                     <div className="bg-white p-8 h-92 w-256 m-0 ml-0 mr-16 my-4">
                       <p className="text-slate-500 mr-96">Diagram 1</p>
-                      {domainBarChart ? <Bar data={domainBarChart} /> : <p>Geen data</p>}
+                      {domainBarChart ? <Bar ref={chartRefs.domain} data={domainBarChart} onClick={domainChartClicked} /> : <p>Geen data</p>}
                     </div>
 
                     <div className="flex justify-start items-end">
@@ -385,13 +431,13 @@ export default function TestPage() {
                 <div className="flex flex-col">
                   <div className="bg-white p-8 h-64 w-96 m-5 ml-2 mr-10">
                     <p className="text-slate-500">Diagram 2</p>
-                    {questionTypeBarChart ? <Bar data={questionTypeBarChart} /> : <p>Geen data</p>}
+                    {questionTypeBarChart ? <Bar ref={chartRefs.questionType} data={questionTypeBarChart} onClick={questionTypeChartClicked} /> : <p>Geen data</p>}
 
                   </div>
 
                   <div className="bg-white p-8 h-64 w-96 m-5 ml-2 mr-10">
                     <p className="text-slate-500">Diagram 3</p>
-                    {questionDimensionBarChart ? <Bar data={questionDimensionBarChart} /> : <p>Geen data</p>}
+                    {questionDimensionBarChart ? <Bar ref={chartRefs.dimension} data={questionDimensionBarChart} onClick={dimensionChartClicked} /> : <p>Geen data</p>}
                   </div>
                 </div>
               </div>           
