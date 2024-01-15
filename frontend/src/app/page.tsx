@@ -28,7 +28,7 @@ ChartJS.register(
   Legend
 );
 
-export default function TestPage() {
+export default function MainPage() {
   const colorOrder = ["#ff6687", "#ffce5d", "#4ed9d9", "#37afff"];
 
 
@@ -359,8 +359,8 @@ export default function TestPage() {
 
     return (
       
-      <div>
-        <div className="flex flex-col h-128 bg-slate-200 text-slate-500">
+      <div className="flex h-screen w-screen bg-slate-200">
+        <div className="flex flex-col h-128 text-slate-500">
         {/* 1e regel */}
           <div className="flex justify-between">
             <div className="bg-white rounded-lg p-7 w-1/4 m-10 mb-2">

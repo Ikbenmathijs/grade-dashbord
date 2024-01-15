@@ -67,9 +67,19 @@ export default class QuestionAnswersDao {
 
     static async getQuestionAnswersByEmail(email: string) {
         try {
-            return await questionsAnswers.find({email: "MathijsM2006@gmail.com"}).toArray();
+            return await questionsAnswers.find({email: email}).toArray();
         } catch (e) {
             log(LogLevel.Debug, `Unable to get question answers: ${e}`);
+            return null;
+        }
+    }
+
+
+    static async deleteQuestionAnswersByTestId(testId: ObjectId) {
+        try {
+            return await questionsAnswers.deleteMany({test: testId});
+        } catch (e) {
+            log(LogLevel.Debug, `Unable to delete question answers: ${e}`);
             return null;
         }
     }
