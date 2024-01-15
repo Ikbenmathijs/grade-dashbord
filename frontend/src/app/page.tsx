@@ -359,8 +359,8 @@ export default function MainPage() {
 
     return (
       
-      <div className="flex h-screen w-screen bg-slate-200">
-        <div className="flex flex-col h-128 text-slate-500">
+      <div>
+        <div className="flex flex-col h-256 text-slate-500">
         {/* 1e regel */}
           <div className="flex justify-between">
             <div className="bg-white rounded-lg p-7 w-1/4 m-10 mb-2">
