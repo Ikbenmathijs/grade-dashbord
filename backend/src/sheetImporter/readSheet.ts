@@ -51,6 +51,8 @@ export async function importSpreadsheet() {
             }
             tests[i]._id = newId;
         }
+        // delete all question answers because people might've been added/removed and might've changed their version
+        QuestionAnswersDao.deleteQuestionAnswersByTestId(tests[i]._id);
     }
 
     for (let i = 0; i < questions.length; i++) {

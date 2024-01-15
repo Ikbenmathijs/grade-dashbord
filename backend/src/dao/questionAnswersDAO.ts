@@ -76,6 +76,11 @@ export default class QuestionAnswersDao {
 
 
     static async deleteQuestionAnswersByTestId(testId: ObjectId) {
-
+        try {
+            return await questionsAnswers.deleteMany({test: testId});
+        } catch (e) {
+            log(LogLevel.Debug, `Unable to delete question answers: ${e}`);
+            return null;
+        }
     }
 }
