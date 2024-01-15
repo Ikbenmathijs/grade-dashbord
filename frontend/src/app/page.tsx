@@ -423,7 +423,7 @@ export default function TestPage() {
                 </div>
 
                 <div className="flex flex-col">
-                  <div className="bg-white p-8 h-64 w-96 m-5 ml-2 mr-10">
+                  <div className="bg-white p-8 h-72 w-96 m-5 ml-2 mr-10">
                     <p className="text-slate-500">Diagram 2</p>
                     {questionTypeBarChart ? <Bar ref={chartRefs.questionType} data={questionTypeBarChart} onClick={questionTypeChartClicked} /> : <p>Geen data</p>}
 
