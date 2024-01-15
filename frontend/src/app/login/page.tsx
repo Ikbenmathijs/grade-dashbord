@@ -5,7 +5,7 @@ import LoginButton from "@/components/loginButton"
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-export default function loginPage() {
+export default function LoginPage() {
 
     const router = useRouter();
     const searchParams = useSearchParams();

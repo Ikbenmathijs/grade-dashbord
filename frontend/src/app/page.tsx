@@ -28,7 +28,7 @@ ChartJS.register(
   Legend
 );
 
-export default function TestPage() {
+export default function MainPage() {
   const colorOrder = ["#ff6687", "#ffce5d", "#4ed9d9", "#37afff"];
 
 

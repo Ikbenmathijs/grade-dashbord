@@ -8,7 +8,7 @@ import CheckLogin from "@/components/checkLogin";
 import User from "@/interfaces/user";
 import { useRouter } from "next/navigation";
 
-export default function uploadPage() {
+export default function UploadPage() {
 
     const [selectedFile, setSelectedFile] = useState<File | undefined>(undefined);
     const [errorMessageDesc, setErrorMessageDesc] = useState("");
