@@ -419,12 +419,6 @@ export default function TestPage() {
                     <div className="bg-white p-8 h-92 w-256 m-0 ml-0 mr-16 my-4">
                       <p className="text-slate-500 mr-96">Diagram 1</p>
                       {domainBarChart ? <Bar ref={chartRefs.domain} data={domainBarChart} onClick={domainChartClicked} /> : <p>Geen data</p>}
-                    </div>
-
-                    <div className="flex justify-start items-end">
-                      <div className="bg-white rounded-lg p-5 h-64 w-full m-5 ml-0 mr-16">
-                        <p className="text-slate-500">Resultaten in percentages</p>
-                      </div>
                     </div> 
                 </div>
 
