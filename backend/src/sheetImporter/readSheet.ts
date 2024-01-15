@@ -73,8 +73,11 @@ export async function importSpreadsheet() {
     }
 
 
+
+    
+
     for (let i = 0; i < questionAnswers.length; i++) {
-        let oldQuestionAnswer = await QuestionAnswersDao.getQuestionAnswerByTestIdAndQuestionNumberAndEmailAndVersion(questionAnswers[i].test, questionAnswers[i].questionNumber, questionAnswers[i].email, questionAnswers[i].version);
+        let oldQuestionAnswer = await QuestionAnswersDao.getQuestionAnswerByTestIdAndQuestionNumberAndEmailAndVersion(questionAnswers[i].test, questionAnswers[i].questionNumber, questionAnswers[i].email.toLowerCase(), questionAnswers[i].version);
         // check if question already exists
         if (oldQuestionAnswer) {
             // question answer already exists, update the question to use the original ID
@@ -86,7 +89,7 @@ export async function importSpreadsheet() {
         } else {
             const newId = await QuestionAnswersDao.insertQuestionAnswer(questionAnswers[i]);
             if (!newId) {
-                throw new Error(`Antwoord van vraag ${questionAnswers[i].questionNumber} van toets ${questionAnswers[i].testName} van leerling met email ${questionAnswers[i].email} kon niet worden geimporteerd! (database gaf een error tijdens insert antwoord)`);
+                throw new Error(`Antwoord van vraag ${questionAnswers[i].questionNumber} van toets ${questionAnswers[i].testName} van leerling met email ${questionAnswers[i].email.toLowerCase()} kon niet worden geimporteerd! (database gaf een error tijdens insert antwoord)`);
             }
             questionAnswers[i]._id = newId;
         
@@ -136,7 +139,7 @@ async function readSheet(): Promise<{tests: Test[], questions: Question[], quest
             const emailCell = sheet.getCell(testLayout.firstStudentRow + j, testLayout.emailColumn);
             let email: string;
             try {
-                email = getCellValueAsString(emailCell);
+                email = getCellValueAsString(emailCell).toLowerCase();
             } catch (e) {
                 break;
             }
