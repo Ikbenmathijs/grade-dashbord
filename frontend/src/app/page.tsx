@@ -29,7 +29,7 @@ ChartJS.register(
 );
 
 export default function TestPage() {
-  const colorOrder = ["#ff6687", "#ffce5d", "#4ed9d9", "#37afff"]
+  const colorOrder = ["#ff6687", "#ffce5d", "#4ed9d9", "#37afff"];
 
 
   const percentageModeOptionsDefault = [<option value="false" key="1">Punten</option>, <option value="true" key="2">Percentages</option>];
