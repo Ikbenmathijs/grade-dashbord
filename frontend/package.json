@@ -16,7 +16,8 @@
     "next": "^13.5.4",
     "react": "latest",
     "react-chartjs-2": "^5.2.0",
-    "react-dom": "latest"
+    "react-dom": "latest",
+    "react-select-search": "^4.1.7"
   },
   "devDependencies": {
     "@types/node": "latest",

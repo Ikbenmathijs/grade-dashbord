@@ -71,4 +71,14 @@ export default class usersDao {
             return null;
         }
     }
+
+
+    static async getUsers() {
+        try {
+            return await users.find().toArray();
+        } catch (e) {
+            log(LogLevel.Debug, `Unable to get users: ${e}`);
+            return null;
+        }
+    }
 }

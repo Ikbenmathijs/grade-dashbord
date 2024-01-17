@@ -4,6 +4,7 @@ import { importSpreadsheet } from './sheetImporter/readSheet';
 import { apiGetTestResults } from './api/testResults';
 import apiImportSheet from './api/sheetImport';
 import { upload } from './index';
+import { apiGetUsers } from './api/users';
 
 /**
  * This file contains all the routes for the API
@@ -21,6 +22,8 @@ export default function getRouter() {
     router.route("/auth/logout").post(apiLogoutUser);
 
     router.route("/testResults").get(apiGetTestResults);
+
+    router.route("/users").get(apiGetUsers);
 
     router.route("/sheets/import").post(upload.single("sheet"), apiImportSheet);
 

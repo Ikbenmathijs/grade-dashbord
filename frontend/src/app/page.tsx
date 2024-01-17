@@ -57,6 +57,11 @@ export default function TestPage() {
 
 
   useEffect(() => {
+    fetchTestResults();
+  }, []);
+
+
+  function fetchTestResults() {
     axios.get(`${process.env.NEXT_PUBLIC_API_URL}/testResults`, {withCredentials: true}).then((response) => {
       console.log(response.data);
       
@@ -74,7 +79,7 @@ export default function TestPage() {
       console.log(e.data);
       //throw e;
     });
-  }, []);
+  }
 
 
   function generateTestOptions(results: TestResult[], selectedIndex: number =-1) {
