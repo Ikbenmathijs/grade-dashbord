@@ -6,8 +6,10 @@ import { ReactElement, useEffect, useState, useRef, MutableRefObject } from "rea
 import axios from "axios";
 import User from "@/interfaces/user";
 import { TestResult } from "@/interfaces/testResult";
+import SelectSearch, { SelectSearchOption } from "react-select-search";
 import QuestionDomain from "@/enums/Test/questionDomain";
 import { Bar, getDatasetAtEvent } from "react-chartjs-2";
+import 'react-select-search/style.css';
 import { ChartData,
   Chart as ChartJS,
   CategoryScale,
@@ -46,6 +48,9 @@ export default function MainPage() {
   const [selectedTestIndex, setSelectedTestIndex] = useState<number>(0);
   const [percentageModeOptions, setPercentageModeOptions] = useState<ReactElement[]>(percentageModeOptionsDefault);
 
+  const [selectUserOptions, setSelectUserOptions] = useState<SelectSearchOption[] | null>(null);
+  const [isAdmin, setIsAdmin] = useState<boolean>(false);
+
   const chartRefs: {[key: string]: MutableRefObject<ChartJS<"bar"> | null>} = {
     domain: useRef<ChartJS<"bar"> | null>(null),
     questionType: useRef<ChartJS<"bar"> | null>(null),
@@ -61,8 +66,12 @@ export default function MainPage() {
   }, []);
 
 
-  function fetchTestResults() {
-    axios.get(`${process.env.NEXT_PUBLIC_API_URL}/testResults`, {withCredentials: true}).then((response) => {
+  function fetchTestResults(userId?: string) {
+    let url = `${process.env.NEXT_PUBLIC_API_URL}/testResults`;
+    if (userId) {
+      url += "?user=" + userId;
+    }
+    axios.get(url, {withCredentials: true}).then((response) => {
       console.log(response.data);
       
       for (let i = 0; i < response.data.length; i++) {
@@ -310,6 +319,23 @@ export default function MainPage() {
       setName(user.email);
       setFullName(user.email);
     }
+
+    if (user.isAdmin) {
+      setIsAdmin(true);
+      // fill select user options
+      axios.get(`${process.env.NEXT_PUBLIC_API_URL}/users`, {withCredentials: true}).then((response) => {
+        console.log(response.data);
+        let options: SelectSearchOption[] = [];
+        for (let i = 0; i < response.data.length; i++) {
+          const user = response.data[i] as User;
+          options.push({name: user.firstName + " " + user.lastName, value: user._id});
+        }
+        setSelectUserOptions(options);
+      }).catch((e) => {
+        console.log(e.data);
+        //throw e;
+      });
+    }
   }
 
 
@@ -364,7 +390,7 @@ export default function MainPage() {
 
     return (
       
-      <div>
+      <div className="bg-slate-200">
         <div className="flex flex-col h-256 text-slate-500">
         {/* 1e regel */}
           <div className="flex justify-between">
@@ -400,11 +426,11 @@ export default function MainPage() {
                     </select>
                   </form>
                 </div>
-                <div className="bg-white rounded-lg p-5 w-4/6 h-24 m-5 ml-10 mr-0">
-                  <p className="text-slate-500">Je hebt nog ... dagen tot de volgende toets.</p>
+                <div hidden={!isAdmin} className="ml-6">
+                  {selectUserOptions ? <SelectSearch options={selectUserOptions} search={true} placeholder="Zoek een leerling..." /> : null}
                 </div>
 
-                <div className="bg-white rounded-lg p-5 w-4/6 h-72 m-5 ml-10 mr-0">
+                {/*<div className="bg-white rounded-lg p-5 w-4/6 h-72 m-5 ml-10 mr-0">
                   <p className="text-slate-500">
                     <b>De volgende hoofdstukken en dimensies:</b>
                     <br /> 
@@ -414,9 +440,9 @@ export default function MainPage() {
                   <br />
                   - Hoofdstuk 9
                   <br />
-                  - Hoofdstuk 10
+                  - Hoofdstuk 10  
                   </p>
-                </div>
+                </div>*/}
               </div>
 
               <div className="flex flex-row">

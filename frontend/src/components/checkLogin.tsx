@@ -20,7 +20,7 @@ export default function CheckLogin({onSuccess}: {onSuccess?: (user: User) => voi
         }).catch((e) => {
             router.push("/login?r=" + pathName);
         });
-    });
+    }, []);
 
 
     return (

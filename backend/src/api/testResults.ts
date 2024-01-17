@@ -19,6 +19,17 @@ export async function apiGetTestResults(req: Request, res: Response, next: NextF
         return;
     }
 
+    if (user.isAdmin) {
+        if (req.query.user) {
+            const userFromQuery = await usersDao.getUserById(new ObjectId(req.query.user as string));
+            if (!userFromQuery) {
+                res.status(404).json({error: "Gebruiker niet gevonden"});
+                return;
+            }
+            user = userFromQuery;
+        }
+    }
+
     const questionAnswers = await QuestionAnswersDao.getQuestionAnswersByEmail(user.email);
 
     if (!questionAnswers) {
