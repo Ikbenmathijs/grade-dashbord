@@ -28,7 +28,7 @@ ChartJS.register(
   Legend
 );
 
-export default function TestPage() {
+export default function MainPage() {
   const colorOrder = ["#ff6687", "#ffce5d", "#4ed9d9", "#37afff"];
 
 
@@ -365,7 +365,7 @@ export default function TestPage() {
     return (
       
       <div>
-        <div className="flex flex-col h-128 bg-slate-200 text-slate-500">
+        <div className="flex flex-col h-256 text-slate-500">
         {/* 1e regel */}
           <div className="flex justify-between">
             <div className="bg-white rounded-lg p-7 w-1/4 m-10 mb-2">
@@ -428,7 +428,7 @@ export default function TestPage() {
                 </div>
 
                 <div className="flex flex-col">
-                  <div className="bg-white p-8 h-64 w-96 m-5 ml-2 mr-10">
+                  <div className="bg-white p-8 h-72 w-96 m-5 ml-2 mr-10">
                     <p className="text-slate-500">Diagram 2</p>
                     {questionTypeBarChart ? <Bar ref={chartRefs.questionType} data={questionTypeBarChart} onClick={questionTypeChartClicked} /> : <p>Geen data</p>}
 

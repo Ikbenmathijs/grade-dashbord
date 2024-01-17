@@ -28,7 +28,7 @@ export default async function apiImportSheet(req: Request, res: Response, next: 
     }
     
     if (!user.isAdmin) {
-        res.status(401).json({error: "Je hebt geen toegang tot deze pagina"});
+        res.status(401).json({error: "Je hebt geen toegang tot deze pagina want je bent geen admin"});
         return;
     }
 

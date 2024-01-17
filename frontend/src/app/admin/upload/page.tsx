@@ -4,8 +4,11 @@ import axios from "axios";
 import ErrorMessage from "@/components/errorMessage";
 import SuccessMessage from "@/components/successMessage";
 import LoadingIcon from "@/components/loadingIcon";
+import CheckLogin from "@/components/checkLogin";
+import User from "@/interfaces/user";
+import { useRouter } from "next/navigation";
 
-export default function uploadPage() {
+export default function UploadPage() {
 
     const [selectedFile, setSelectedFile] = useState<File | undefined>(undefined);
     const [errorMessageDesc, setErrorMessageDesc] = useState("");
@@ -15,6 +18,8 @@ export default function uploadPage() {
     const [successMessageTitle, setSuccessMessageTitle] = useState("");
     const [successMessageHidden, setSuccessMessageHidden] = useState(true);
     const [loading, setLoading] = useState(false);
+
+    const router = useRouter();
 
 
     async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -50,6 +55,12 @@ export default function uploadPage() {
         });
     }
 
+    function onLoginCheckFinished(user: User) {
+        if (!user.isAdmin) {
+            router.push("/");
+        }
+    }
+
 
     return (<>
     <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 p-4">
@@ -70,7 +81,7 @@ export default function uploadPage() {
             </div>
         </div>
     </div>
-        
+        <CheckLogin onSuccess={onLoginCheckFinished} />
 
         <ErrorMessage title={errorMessageTitle} desc={errorMessageDesc} hidden={errorMessageHidden} setHiddenCallback={setErrorMessageHidden} />
         <SuccessMessage title={successMessageTitle} desc={successMessageDesc} hidden={successMessageHidden} setHiddenCallback={setSuccessMessageHidden} />

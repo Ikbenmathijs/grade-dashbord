@@ -48,7 +48,7 @@ app.use(express.urlencoded({
 })); // Add this line to parse form data
 
 // This assigns the routes from route.ts to the /api path
-app.use("/api", getRouter());
+app.use("/prestatieportaal-api", getRouter());
 
 
 
