@@ -390,25 +390,25 @@ export default function MainPage() {
 
     return (
       
-      <div className="bg-slate-200">
-        <div className="flex flex-col h-256 text-slate-500">
+    <div className="bg-slate-200">
+      <div className="flex flex-col h-auto text-slate-500">
         {/* 1e regel */}
-          <div className="flex justify-between">
-            <div className="bg-white rounded-lg p-7 w-1/4 m-10 mb-2">
-              <b className="text-slate-700 text-2xl">Welkom {name}!</b>
-              <p className="text-slate-500">Dashboard van {fullName}</p>
-            </div>
-          
-            <div className="bg-white rounded-lg p-5 w-1/6 h-16 m-10 mb-2 flex-row-reverse">
-              <p className="text-slate-500 text-right text-lg">Scheikunde</p>
-            </div>
+        <div className="flex flex-wrap justify-between">
+          <div className="bg-white rounded-lg p-4 lg:p-7 w-full lg:w-1/4 m-4 lg:m-10 mb-2">
+            <b className="text-slate-700 text-xl lg:text-2xl">Welkom {name}!</b>
+            <p className="text-slate-500">Dashboard van {fullName}</p>
           </div>
+    
+          <div className="bg-white rounded-lg p-4 lg:p-5 w-full lg:w-1/6 h-16 m-4 lg:m-10 mb-2">
+            <p className="text-slate-500 text-right text-lg">Scheikunde</p>
+          </div>
+        </div>
+    
 
-          {/* 2e regel */}          
-          <div className="flex flex-col">
-            <div className="flex justify-between">
-              <div className="flex flex-col">
-                <div className="bg-white rounded-lg w-4/6 h-40 ml-10 p-5 m-5">
+          {/* 2e regel */}
+            <div className="flex flex-wrap justify-between">
+              <div className="flex flex-col w-full lg:w-4/6">
+                <div className="bg-white rounded-lg p-4 lg:p-5 m-4">
                   <p>Kies hier de toets die je wilt bekijken:</p>
                   <br />
                   {/* Toets selectie menu */}
@@ -478,7 +478,6 @@ export default function MainPage() {
         </div>
         
 
-        </div>
-      </div>
+    </div>
     )
   }
