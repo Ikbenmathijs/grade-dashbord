@@ -394,13 +394,13 @@ export default function MainPage() {
     <div className="text-slate-500">
       {/* 1e regel */}
       <div className="flex flex-col md:flex-row justify-between m-10">
-        <div className="bg-white rounded-lg p-7 mb-4 w-full md:w-1/4">
+        <div className="bg-yellow-40 rounded-lg p-7 mb-4 w-full md:w-1/4">
           <b className="text-red-500 text-2xl">Welkom {name}!</b>
           <p className="text-slate-500">Dashboard van {fullName}</p>
         </div>
       
         <div className="bg-white rounded-lg p-5 mb-4 w-full md:w-1/6">
-          <p className="text-slate-500 text-right text-lg">Scheikunde</p>
+          <p className="text-slate-500 text-left text-lg">Scheikunde</p>
         </div>
       </div>
 
