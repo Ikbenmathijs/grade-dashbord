@@ -6,7 +6,7 @@ import { ReactElement, useEffect, useState, useRef, MutableRefObject } from "rea
 import axios from "axios";
 import User from "@/interfaces/user";
 import { TestResult } from "@/interfaces/testResult";
-import SelectSearch, { SelectSearchOption } from "react-select-search";
+import SelectSearch, { SelectSearchOption, SelectedOption, SelectedOptionValue } from "react-select-search";
 import QuestionDomain from "@/enums/Test/questionDomain";
 import { Bar, getDatasetAtEvent } from "react-chartjs-2";
 import 'react-select-search/style.css';
@@ -388,6 +388,13 @@ export default function MainPage() {
   }
 
 
+  function onUserSelected(arg: any) {
+    const userId = arg as string;
+    if (userId) {
+      fetchTestResults(userId);
+    }
+  }
+
 
 
   return (
@@ -429,7 +436,7 @@ export default function MainPage() {
                 </form>
               </div>
               <div hidden={!isAdmin} className="ml-6">
-                {selectUserOptions ? <SelectSearch options={selectUserOptions} search={true} placeholder="Zoek een leerling..." /> : null}
+                {selectUserOptions ? <SelectSearch onChange={onUserSelected}  options={selectUserOptions} search={true} placeholder="Zoek een leerling..." /> : null}
               </div>
 
               <div className="bg-white rounded-lg p-5 w-4/6 m-5 ml-10 mr-0">
