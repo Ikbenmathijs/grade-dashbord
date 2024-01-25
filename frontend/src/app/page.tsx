@@ -389,86 +389,75 @@ export default function MainPage() {
 
 
     return (
-      
-      <div className="bg-slate-200">
-        <div className="flex flex-col h-256 text-slate-500">
-        {/* 1e regel */}
-          <div className="flex justify-between">
-            <div className="bg-white rounded-lg p-7 w-1/4 m-10 mb-2">
-              <b className="text-slate-700 text-2xl">Welkom {name}!</b>
-              <p className="text-slate-500">Dashboard van {fullName}</p>
-            </div>
-          
-            <div className="bg-white rounded-lg p-5 w-1/6 h-16 m-10 mb-2 flex-row-reverse">
-              <p className="text-slate-500 text-right text-lg">Scheikunde</p>
-            </div>
-          </div>
-
-          {/* 2e regel */}          
-          <div className="flex flex-col">
-            <div className="flex justify-between">
-              <div className="flex flex-col">
-                <div className="bg-white rounded-lg w-4/6 h-40 ml-10 p-5 m-5">
-                  <p>Kies hier de toets die je wilt bekijken:</p>
-                  <br />
-                  {/* Toets selectie menu */}
-                  <form>
-                    <select onChange={e => processResults(parseInt(e.target.value))}>
-                      
-                      {selectTestOptions ? selectTestOptions.map((e) => {return e}) : ""}
-                    </select>
-                  </form>
-
-                  {/* Punten of percentages selectie menu */}
-                  <form>
-                    <select onChange={e => {setPercentageMode(e.target.value === "true"); processResults(undefined, undefined, e.target.value === "true")}}>
-                      {percentageModeOptions.map((e) => {return e})}
-                    </select>
-                  </form>
-                </div>
-                <div hidden={!isAdmin} className="ml-6">
-                  {selectUserOptions ? <SelectSearch options={selectUserOptions} search={true} placeholder="Zoek een leerling..." /> : null}
-                </div>
-
-                <div className="bg-white rounded-lg p-5 w-4/6 m-5 ml-10 mr-0">
-                  <a target="_blank" className="underline text-cyan-500" href="https://forms.gle/sKo1BUPxSpEHudxQA">Geef feedback op de site!</a>
-                </div>
-              </div>
-
-              <div className="flex flex-row">
-                <div className="flex flex-col justify-items-start">
-                    <div className="bg-white p-8 h-92 w-256 m-0 ml-0 mr-16 my-4">
-                      <p className="text-slate-500 mr-96">Diagram 1</p>
-                      {domainBarChart ? <Bar ref={chartRefs.domain} data={domainBarChart} onClick={domainChartClicked} /> : <p>Geen data</p>}
-                    </div> 
-                </div>
-
-                <div className="flex flex-col">
-                  <div className="bg-white p-8 h-72 w-96 m-5 ml-2 mr-10">
-                    <p className="text-slate-500">Diagram 2</p>
-                    {questionTypeBarChart ? <Bar ref={chartRefs.questionType} data={questionTypeBarChart} onClick={questionTypeChartClicked} /> : <p>Geen data</p>}
-
-                  </div>
-
-                  <div className="bg-white p-8 h-64 w-96 m-5 ml-2 mr-10">
-                    <p className="text-slate-500">Diagram 3</p>
-                    {questionDimensionBarChart ? <Bar ref={chartRefs.dimension} data={questionDimensionBarChart} onClick={dimensionChartClicked} /> : <p>Geen data</p>}
-                  </div>
-                </div>
-              </div>           
-            </div>
-          </div>
-          
- 
-
-        <CheckLogin onSuccess={onUserFetched} />
-
-        <div>
-          <LogoutButton />
+    <div className="">  
+        <div className=" bg-slate-200 min-h-full" style={{ backgroundColor: '#e2e8f0' }}>
+    <div className="text-slate-500">
+      {/* 1e regel */}
+      <div className="flex flex-col md:flex-row justify-between m-10">
+        <div className="bg-yellow-40 rounded-lg p-7 mb-4 w-full md:w-1/4">
+          <b className="text-red-500 text-2xl">Welkom {name}!</b>
+          <p className="text-slate-500">Dashboard van {fullName}</p>
         </div>
-        
-
+      
+        <div className="bg-white rounded-lg p-5 mb-4 w-full md:w-1/6">
+          <p className="text-slate-500 text-left text-lg">Scheikunde</p>
         </div>
       </div>
-    )
-  }
+
+      {/* 2e regel */}
+      <div className="m-10">
+        <div className="bg-white rounded-lg p-5 mb-4">
+          <p>Kies hier de toets die je wilt bekijken:</p>
+          {/* Toets selectie menu */}
+          <form>
+            <select onChange={e => processResults(parseInt(e.target.value))}>
+              {selectTestOptions ? selectTestOptions.map((e) => {return e}) : ""}
+            </select>
+          </form>
+
+          {/* Punten of percentages selectie menu */}
+          <form>
+            <select onChange={e => {setPercentageMode(e.target.value === "true"); processResults(undefined, undefined, e.target.value === "true")}}>
+              {percentageModeOptions.map((e) => {return e})}
+            </select>
+          </form>
+        </div>
+        <div hidden={!isAdmin} className="mb-4">
+          {selectUserOptions ? <SelectSearch options={selectUserOptions} search={true} placeholder="Zoek een leerling..." /> : null}
+        </div>
+
+        <div className="bg-white rounded-lg p-5 w-4/6 m-5 ml-10 mr-0">
+          <a target="_blank" className="underline text-cyan-500" href="https://forms.gle/sKo1BUPxSpEHudxQA">Geef feedback op de site!</a>
+        </div>
+
+
+      </div>
+
+      {/* Grafieken */}
+      <div className="m-10">
+        <div className="bg-white p-8 mb-4">
+          <p className="text-slate-500">Diagram 1</p>
+          {domainBarChart ? <Bar ref={chartRefs.domain} data={domainBarChart} onClick={domainChartClicked} /> : <p>Geen data</p>}
+        </div>
+
+        <div className="bg-white p-8 mb-4">
+          <p className="text-slate-500">Diagram 2</p>
+          {questionTypeBarChart ? <Bar ref={chartRefs.questionType} data={questionTypeBarChart} onClick={questionTypeChartClicked} /> : <p>Geen data</p>}
+        </div>
+
+        <div className="bg-white p-8 mb-4">
+          <p className="text-slate-500">Diagram 3</p>
+          {questionDimensionBarChart ? <Bar ref={chartRefs.dimension} data={questionDimensionBarChart} onClick={dimensionChartClicked} /> : <p>Geen data</p>}
+        </div>
+      </div>
+
+      <CheckLogin onSuccess={onUserFetched} />
+      <LogoutButton />
+    </div>
+  </div>
+
+  </div>
+
+
+      )
+    }
