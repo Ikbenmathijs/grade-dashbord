@@ -10,14 +10,16 @@ import SelectSearch, { SelectSearchOption } from "react-select-search";
 import QuestionDomain from "@/enums/Test/questionDomain";
 import { Bar, getDatasetAtEvent } from "react-chartjs-2";
 import 'react-select-search/style.css';
-import { ChartData,
+import {
+  ChartData,
   Chart as ChartJS,
   CategoryScale,
   LinearScale,
   BarElement,
   Title,
   Tooltip,
-  Legend } from "chart.js";
+  Legend
+} from "chart.js";
 
 
 
@@ -51,14 +53,14 @@ export default function MainPage() {
   const [selectUserOptions, setSelectUserOptions] = useState<SelectSearchOption[] | null>(null);
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
 
-  const chartRefs: {[key: string]: MutableRefObject<ChartJS<"bar"> | null>} = {
+  const chartRefs: { [key: string]: MutableRefObject<ChartJS<"bar"> | null> } = {
     domain: useRef<ChartJS<"bar"> | null>(null),
     questionType: useRef<ChartJS<"bar"> | null>(null),
     dimension: useRef<ChartJS<"bar"> | null>(null)
   }
 
 
-  
+
 
 
   useEffect(() => {
@@ -71,9 +73,9 @@ export default function MainPage() {
     if (userId) {
       url += "?user=" + userId;
     }
-    axios.get(url, {withCredentials: true}).then((response) => {
+    axios.get(url, { withCredentials: true }).then((response) => {
       console.log(response.data);
-      
+
       for (let i = 0; i < response.data.length; i++) {
         const test = response.data[i] as TestResult;
       }
@@ -91,7 +93,7 @@ export default function MainPage() {
   }
 
 
-  function generateTestOptions(results: TestResult[], selectedIndex: number =-1) {
+  function generateTestOptions(results: TestResult[], selectedIndex: number = -1) {
     let options: ReactElement[] = [];
     options.push(<option value="-1" key="1" selected={selectedIndex === -1}>Alle toetsen</option>);
     for (let i = 0; i < results.length; i++) {
@@ -105,10 +107,10 @@ export default function MainPage() {
   function processResults(testIndex: number = selectedTestIndex, results: TestResult[] = testResults, usePercentages: boolean = percentageMode, color?: string) {
     setSelectedTestIndex(testIndex);
 
-    
+
 
     const domainNames = ["Stoffen en materialen", "Reacties",
-    "Industrie en analyse", "Rekenen", "Chemie van het leven", "Energie en duurzaamheid"];
+      "Industrie en analyse", "Rekenen", "Chemie van het leven", "Energie en duurzaamheid"];
     const questionTypes = ["Formule", "Berekening", "Leg Uit"];
     const questionDimensions = ["Reproductie", "Toepassing", "Inzicht"];
 
@@ -138,7 +140,7 @@ export default function MainPage() {
     let totalPointsPerQuestionDimension = [] as number[][];
     let pointsGainedPerQuestionDimension = [] as number[][];
     let percentagesPerQuestionDimension = [] as number[][];
-    
+
 
     for (let i = 0; i < tests.length; i++) {
 
@@ -160,18 +162,18 @@ export default function MainPage() {
         totalPointsPerDomain[i][questions[j].domain] += questions[j].totalPoints;
         pointsGainedPerDomain[i][questions[j].domain] += questions[j].pointsGained;
         percentagesPerDomain[i][questions[j].domain] = pointsGainedPerDomain[i][questions[j].domain] / totalPointsPerDomain[i][questions[j].domain] * 100;
-  
+
         totalPointsPerQuestionType[i][questions[j].questionType] += questions[j].totalPoints;
         pointsGainedPerQuestionType[i][questions[j].questionType] += questions[j].pointsGained;
         percentagesPerQuestionType[i][questions[j].questionType] = pointsGainedPerQuestionType[i][questions[j].questionType] / totalPointsPerQuestionType[i][questions[j].questionType] * 100;
-  
+
         totalPointsPerQuestionDimension[i][questions[j].dimension] += questions[j].totalPoints;
         pointsGainedPerQuestionDimension[i][questions[j].dimension] += questions[j].pointsGained;
         percentagesPerQuestionDimension[i][questions[j].dimension] = pointsGainedPerQuestionDimension[i][questions[j].dimension] / totalPointsPerQuestionDimension[i][questions[j].dimension] * 100;
       }
     }
-    
-    
+
+
     let domainPercentagesDatassets = [];
     let domainTotalPointsDatasets = [];
 
@@ -189,7 +191,7 @@ export default function MainPage() {
           label: `Behaalde punten voor ${tests[i].name}`,
           data: pointsGainedPerDomain[i],
           backgroundColor: [
-              color ? color : colorOrder[testIndex % colorOrder.length]
+            color ? color : colorOrder[testIndex % colorOrder.length]
           ]
         }
       ]);
@@ -214,7 +216,7 @@ export default function MainPage() {
 
     setDomainBarChart(domainBarChartData);
 
-    
+
     let questionTotalPointsDatasets = [];
     let questionPercentagesDatasets = [];
 
@@ -251,7 +253,7 @@ export default function MainPage() {
       })
     }
 
-    let questionTypeBarChartData ={
+    let questionTypeBarChartData = {
       labels: questionTypes,
       datasets: !usePercentages ? questionTotalPointsDatasets : questionPercentagesDatasets
     }
@@ -281,7 +283,7 @@ export default function MainPage() {
           label: `Behaalde punten voor ${tests[i].name}`,
           data: pointsGainedPerQuestionDimension[i],
           backgroundColor: [
-              color ? color : colorOrder[testIndex % colorOrder.length]
+            color ? color : colorOrder[testIndex % colorOrder.length]
           ]
         }
       ]);
@@ -323,12 +325,12 @@ export default function MainPage() {
     if (user.isAdmin) {
       setIsAdmin(true);
       // fill select user options
-      axios.get(`${process.env.NEXT_PUBLIC_API_URL}/users`, {withCredentials: true}).then((response) => {
+      axios.get(`${process.env.NEXT_PUBLIC_API_URL}/users`, { withCredentials: true }).then((response) => {
         console.log(response.data);
         let options: SelectSearchOption[] = [];
         for (let i = 0; i < response.data.length; i++) {
           const user = response.data[i] as User;
-          options.push({name: user.firstName + " " + user.lastName, value: user._id});
+          options.push({ name: user.firstName + " " + user.lastName, value: user._id });
         }
         setSelectUserOptions(options);
       }).catch((e) => {
@@ -358,7 +360,7 @@ export default function MainPage() {
 
 
     if (chart) {
-      const bars = chart.getElementsAtEventForMode(e, "nearest", {intersect: true}, true);
+      const bars = chart.getElementsAtEventForMode(e, "nearest", { intersect: true }, true);
       if (bars.length == 0) {
         return;
       }
@@ -370,14 +372,14 @@ export default function MainPage() {
             const color = chart.data.datasets[bar.datasetIndex].backgroundColor;
             if (selectedTestIndex == -1) {
               // this is so cursed but typescript wants me to
-              if (color && typeof (color as any)[0] === "string") { 
+              if (color && typeof (color as any)[0] === "string") {
                 processResults(i, testResults, percentageMode, (color as any)[0]);
               } else {
                 processResults(i, testResults, percentageMode);
               }
             } else {
               processResults(-1, testResults, percentageMode);
-              
+
             }
           }
         }
@@ -388,76 +390,86 @@ export default function MainPage() {
 
 
 
-    return (
-    <div className="">  
-        <div className=" bg-slate-200 min-h-full" style={{ backgroundColor: '#e2e8f0' }}>
-    <div className="text-slate-500">
-      {/* 1e regel */}
-      <div className="flex flex-col md:flex-row justify-between m-10">
-        <div className="bg-yellow-40 rounded-lg p-7 mb-4 w-full md:w-1/4">
-          <b className="text-red-500 text-2xl">Welkom {name}!</b>
-          <p className="text-slate-500">Dashboard van {fullName}</p>
+  return (
+
+    <div className="bg-slate-200">
+      <div className="flex flex-col h-256 text-slate-500">
+        {/* 1e regel */}
+        <div className="flex justify-between">
+          <div className="bg-white rounded-lg p-7 w-1/4 m-10 mb-2">
+            <b className="text-slate-700 text-2xl">Welkom {name}!</b>
+            <p className="text-slate-500">Dashboard van {fullName}</p>
+          </div>
+
+          <div className="bg-white rounded-lg p-5 w-1/6 h-16 m-10 mb-2 flex-row-reverse">
+            <p className="text-slate-500 text-right text-lg">Scheikunde</p>
+          </div>
         </div>
-      
-        <div className="bg-white rounded-lg p-5 mb-4 w-full md:w-1/6">
-          <p className="text-slate-500 text-left text-lg">Scheikunde</p>
+
+        {/* 2e regel */}
+        <div className="flex flex-col">
+          <div className="flex justify-between">
+            <div className="flex flex-col">
+              <div className="bg-white rounded-lg w-4/6 h-40 ml-10 p-5 m-5">
+                <p>Kies hier de toets die je wilt bekijken:</p>
+                <br />
+                {/* Toets selectie menu */}
+                <form>
+                  <select onChange={e => processResults(parseInt(e.target.value))}>
+
+                    {selectTestOptions ? selectTestOptions.map((e) => { return e }) : ""}
+                  </select>
+                </form>
+
+                {/* Punten of percentages selectie menu */}
+                <form>
+                  <select onChange={e => { setPercentageMode(e.target.value === "true"); processResults(undefined, undefined, e.target.value === "true") }}>
+                    {percentageModeOptions.map((e) => { return e })}
+                  </select>
+                </form>
+              </div>
+              <div hidden={!isAdmin} className="ml-6">
+                {selectUserOptions ? <SelectSearch options={selectUserOptions} search={true} placeholder="Zoek een leerling..." /> : null}
+              </div>
+
+              <div className="bg-white rounded-lg p-5 w-4/6 m-5 ml-10 mr-0">
+                <a target="_blank" className="underline text-cyan-500" href="https://forms.gle/sKo1BUPxSpEHudxQA">Geef feedback op de site!</a>
+              </div>
+            </div>
+
+            <div className="flex flex-row">
+              <div className="flex flex-col justify-items-start">
+                <div className="bg-white p-8 h-92 w-256 m-0 ml-0 mr-16 my-4">
+                  <p className="text-slate-500 mr-96">Diagram 1</p>
+                  {domainBarChart ? <Bar ref={chartRefs.domain} data={domainBarChart} onClick={domainChartClicked} /> : <p>Geen data</p>}
+                </div>
+              </div>
+
+              <div className="flex flex-col">
+                <div className="bg-white p-8 h-72 w-96 m-5 ml-2 mr-10">
+                  <p className="text-slate-500">Diagram 2</p>
+                  {questionTypeBarChart ? <Bar ref={chartRefs.questionType} data={questionTypeBarChart} onClick={questionTypeChartClicked} /> : <p>Geen data</p>}
+
+                </div>
+
+                <div className="bg-white p-8 h-64 w-96 m-5 ml-2 mr-10">
+                  <p className="text-slate-500">Diagram 3</p>
+                  {questionDimensionBarChart ? <Bar ref={chartRefs.dimension} data={questionDimensionBarChart} onClick={dimensionChartClicked} /> : <p>Geen data</p>}
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
+
+
+        <CheckLogin onSuccess={onUserFetched} />
+
+        <div>
+          <LogoutButton />
+        </div>
+
+
       </div>
-
-      {/* 2e regel */}
-      <div className="m-10">
-        <div className="bg-white rounded-lg p-5 mb-4">
-          <p>Kies hier de toets die je wilt bekijken:</p>
-          {/* Toets selectie menu */}
-          <form>
-            <select onChange={e => processResults(parseInt(e.target.value))}>
-              {selectTestOptions ? selectTestOptions.map((e) => {return e}) : ""}
-            </select>
-          </form>
-
-          {/* Punten of percentages selectie menu */}
-          <form>
-            <select onChange={e => {setPercentageMode(e.target.value === "true"); processResults(undefined, undefined, e.target.value === "true")}}>
-              {percentageModeOptions.map((e) => {return e})}
-            </select>
-          </form>
-        </div>
-        <div hidden={!isAdmin} className="mb-4">
-          {selectUserOptions ? <SelectSearch options={selectUserOptions} search={true} placeholder="Zoek een leerling..." /> : null}
-        </div>
-
-        <div className="bg-white rounded-lg p-5 w-4/6 m-5 ml-10 mr-0">
-          <a target="_blank" className="underline text-cyan-500" href="https://forms.gle/sKo1BUPxSpEHudxQA">Geef feedback op de site!</a>
-        </div>
-
-
-      </div>
-
-      {/* Grafieken */}
-      <div className="m-10">
-        <div className="bg-white p-8 mb-4">
-          <p className="text-slate-500">Diagram 1</p>
-          {domainBarChart ? <Bar ref={chartRefs.domain} data={domainBarChart} onClick={domainChartClicked} /> : <p>Geen data</p>}
-        </div>
-
-        <div className="bg-white p-8 mb-4">
-          <p className="text-slate-500">Diagram 2</p>
-          {questionTypeBarChart ? <Bar ref={chartRefs.questionType} data={questionTypeBarChart} onClick={questionTypeChartClicked} /> : <p>Geen data</p>}
-        </div>
-
-        <div className="bg-white p-8 mb-4">
-          <p className="text-slate-500">Diagram 3</p>
-          {questionDimensionBarChart ? <Bar ref={chartRefs.dimension} data={questionDimensionBarChart} onClick={dimensionChartClicked} /> : <p>Geen data</p>}
-        </div>
-      </div>
-
-      <CheckLogin onSuccess={onUserFetched} />
-      <LogoutButton />
     </div>
-  </div>
-
-  </div>
-
-
-      )
-    }
+  )
+}
