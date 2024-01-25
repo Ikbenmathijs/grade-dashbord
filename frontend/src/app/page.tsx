@@ -430,19 +430,9 @@ export default function MainPage() {
                   {selectUserOptions ? <SelectSearch options={selectUserOptions} search={true} placeholder="Zoek een leerling..." /> : null}
                 </div>
 
-                {/*<div className="bg-white rounded-lg p-5 w-4/6 h-72 m-5 ml-10 mr-0">
-                  <p className="text-slate-500">
-                    <b>De volgende hoofdstukken en dimensies:</b>
-                    <br /> 
-                    <i>Bijvoorbeeld</i>
-                  <br />
-                  - Hoofdstuk 8
-                  <br />
-                  - Hoofdstuk 9
-                  <br />
-                  - Hoofdstuk 10  
-                  </p>
-                </div>*/}
+                <div className="bg-white rounded-lg p-5 w-4/6 m-5 ml-10 mr-0">
+                  <a target="_blank" className="underline text-cyan-500" href="https://forms.gle/sKo1BUPxSpEHudxQA">Geef feedback op de site!</a>
+                </div>
               </div>
 
               <div className="flex flex-row">
